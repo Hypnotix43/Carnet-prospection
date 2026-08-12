@@ -675,7 +675,10 @@ document.getElementById('prospectForm').addEventListener('submit', async (e)=>{
     const idx = prospects.findIndex(p=>p.id===editingId);
     if(idx>-1) prospects[idx] = {...prospects[idx], ...data};
   } else {
-    prospects.push({ id: 'p_'+Date.now()+'_'+Math.random().toString(36).slice(2,8), createdAt: Date.now(), ...data });
+    prospects.push({
+  ...data,
+  createdAt: Date.now()
+});
   }
 
   // Mise à jour immédiate à l'écran, sans attendre la sauvegarde en ligne
