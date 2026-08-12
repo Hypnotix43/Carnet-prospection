@@ -324,7 +324,7 @@ datalist{}
 
 <div class="toast" id="toast"></div>
 
-script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 const SUPABASE_URL = 'https://rydlmsnkttpbnqqhhplk.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_5Gtj4UbjxG7eqgYwFyPW0w_x0yjzUeX';
 
@@ -419,12 +419,21 @@ function showToast(msg){
 }
 
 async function loadProspects(){
-  try{
-    const res = await window.storage.get(STORAGE_KEY, false);
-    prospects = res && res.value ? JSON.parse(res.value) : [];
-  }catch(e){
-    prospects = [];
+  if (!currentUser) return;
+
+  const { data, error } = await supabaseClient
+    .from('prospects')
+    .select('*')
+    .eq('user_id', currentUser.id)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Erreur chargement:', error);
+    showToast('⚠️ Impossible de charger les prospects');
+    return;
   }
+
+  prospects = data || [];
   render();
 }
 
@@ -436,15 +445,39 @@ function withTimeout(promise, ms){
 }
 
 async function saveProspects(){
-  try{
-    if(!window.storage) throw new Error('no-storage');
-    const result = await withTimeout(window.storage.set(STORAGE_KEY, JSON.stringify(prospects), false), 6000);
-    if(!result){ showToast("⚠️ Sauvegarde en ligne échouée — pense à exporter en JSON."); }
-  }catch(e){
-    showToast("⚠️ Sauvegarde en ligne indisponible — pense à exporter en JSON.");
+  if (!currentUser) return;
+
+  try {
+    const rows = prospects.map(p => ({
+      id: p.id,
+      user_id: currentUser.id,
+      name: p.name,
+      phone: p.phone || '',
+      email: p.email || '',
+      category: p.category || 'Autres',
+      status: p.status || 'À contacter',
+      followup: p.followup || null,
+      notes: p.notes || '',
+      created_at: p.createdAt || Date.now()
+    }));
+
+    const { error } = await supabaseClient
+      .from('prospects')
+      .upsert(rows, { onConflict: 'id' });
+
+    if (error) {
+      console.error('Erreur sauvegarde:', error);
+      showToast('⚠️ Erreur de sauvegarde');
+      return;
+    }
+
+    showToast('Sauvegardé dans le cloud ✓');
+
+  } catch (e) {
+    console.error(e);
+    showToast('⚠️ Erreur de sauvegarde');
   }
 }
-
 function allCategories(){
   const used = [...new Set(prospects.map(p=>p.category))];
   const merged = [...new Set([...DEFAULT_CATEGORIES, ...used])];
@@ -724,7 +757,7 @@ document.getElementById('fileImport').addEventListener('change', (e)=>{
   e.target.value = '';
 });
 
-loadProspects();
+checkAuth();
 </script>
 </body>
 </html>
