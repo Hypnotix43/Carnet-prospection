@@ -676,8 +676,9 @@ document.getElementById('prospectForm').addEventListener('submit', async (e)=>{
     if(idx>-1) prospects[idx] = {...prospects[idx], ...data};
   } else {
     prospects.push({
+  id: crypto.randomUUID(),
   ...data,
-  createdAt: Date.now()
+  createdAt: new Date().toISOString()
 });
   }
 
