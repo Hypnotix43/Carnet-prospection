@@ -160,7 +160,84 @@ datalist{}
 </style>
 </head>
 <body>
+<div id="loginScreen" style="
+  position:fixed;
+  inset:0;
+  background:#FAF7F0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+  padding:20px;
+">
+  <div style="
+    width:100%;
+    max-width:400px;
+    background:white;
+    border:1px solid #E4DFD1;
+    border-radius:14px;
+    padding:30px;
+  ">
+    <div style="
+      font-size:11px;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      color:#8F6A3B;
+      font-weight:600;
+      margin-bottom:6px;
+    ">
+      Assurance & placement — Québec
+    </div>
 
+    <h2 style="
+      font-family:Georgia,serif;
+      color:#1B2A45;
+      margin:0 0 20px;
+    ">
+      Connexion
+    </h2>
+
+    <div style="margin-bottom:14px;">
+      <label style="display:block;font-size:13px;font-weight:600;margin-bottom:5px;">
+        Courriel
+      </label>
+      <input
+        type="email"
+        id="loginEmail"
+        style="width:100%;padding:10px;border:1px solid #E4DFD1;border-radius:8px;"
+        autocomplete="email"
+      >
+    </div>
+
+    <div style="margin-bottom:18px;">
+      <label style="display:block;font-size:13px;font-weight:600;margin-bottom:5px;">
+        Mot de passe
+      </label>
+      <input
+        type="password"
+        id="loginPassword"
+        style="width:100%;padding:10px;border:1px solid #E4DFD1;border-radius:8px;"
+        autocomplete="current-password"
+      >
+    </div>
+
+    <button
+      id="loginButton"
+      class="btn-primary"
+      style="width:100%;justify-content:center;"
+    >
+      Se connecter
+    </button>
+
+    <div id="loginError" style="
+      color:#B24B3C;
+      font-size:13px;
+      margin-top:12px;
+      display:none;
+    "></div>
+  </div>
+</div>
+  
 <header class="masthead">
   <div class="masthead-inner">
     <div>
@@ -255,7 +332,60 @@ const supabaseClient = window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_PUBLISHABLE_KEY
 );
+let currentUser = null;
 
+async function checkAuth() {
+  const { data, error } = await supabaseClient.auth.getUser();
+
+  if (error || !data.user) {
+    document.getElementById('loginScreen').style.display = 'flex';
+    return false;
+  }
+
+  currentUser = data.user;
+  document.getElementById('loginScreen').style.display = 'none';
+
+  return true;
+}
+
+async function login() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+
+  const errorBox = document.getElementById('loginError');
+
+  errorBox.style.display = 'none';
+
+  if (!email || !password) {
+    errorBox.textContent = 'Veuillez entrer votre courriel et votre mot de passe.';
+    errorBox.style.display = 'block';
+    return;
+  }
+
+  const { data, error } = await supabaseClient.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if (error) {
+    errorBox.textContent = 'Courriel ou mot de passe incorrect.';
+    errorBox.style.display = 'block';
+    return;
+  }
+
+  currentUser = data.user;
+
+  document.getElementById('loginScreen').style.display = 'none';
+
+  await loadProspects();
+}
+
+document.getElementById('loginButton').addEventListener('click', login);
+
+document.getElementById('loginPassword').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') login();
+});
+  
 let prospects = [];
 let editingId = null;
 let activeFilter = 'all';
