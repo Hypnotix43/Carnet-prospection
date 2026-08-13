@@ -594,15 +594,6 @@ h1{
   display: inline-block;
 }
 
-/* Image icon wrapper in badges / dropdowns */
-.cat-icon-render {
-  width: 16px;
-  height: 16px;
-  object-fit: contain;
-  vertical-align: middle;
-  display: inline-block;
-}
-
 /* ---------- Toast ---------- */
 
 .toast{
@@ -796,7 +787,7 @@ h1{
   <div class="modal">
     <h2 id="catModalTitle">Gérer les catégories & icônes</h2>
     <p style="font-size: 13px; color: var(--slate); margin-top: -10px; margin-bottom: 16px;" id="catModalSub">
-      Personnalisez vos catégories avec des couleurs et des icônes (émoji ou URL d'image en ligne).
+      Personnalisez vos catégories avec des couleurs et des icônes uniques.
     </p>
 
     <div class="cat-list" id="customCatList"></div>
@@ -810,10 +801,41 @@ h1{
           <input type="text" id="newCatName" placeholder="Nom de la catégorie" required>
         </div>
         <div class="field" style="width:60px; margin-bottom:0;">
-          <input type="color" id="newCatColor" value="#B8874F" style="height:38px; padding:2px; cursor:pointer;" title="Couleur de la catégorie">
+          <input type="color" id="newCatColor" value="#B8874F" style="height:38px; padding:2px; cursor:pointer;">
         </div>
-        <div class="field" style="flex:1.5; margin-bottom:0;">
-          <input type="text" id="newCatIcon" placeholder="Émoji (👤) ou URL d'image..." style="height:38px; font-size:13px;">
+        <div class="field" style="width:75px; margin-bottom:0;">
+          <select id="newCatIcon" style="height:38px;">
+            <option value="👤">👤</option>
+            <option value="💼">💼</option>
+            <option value="🤝">🤝</option>
+            <option value="🏠">🏠</option>
+            <option value="⭐">⭐</option>
+            <option value="📈">📈</option>
+            <option value="📞">📞</option>
+            <option value="🎯">🎯</option>
+            <option value="⚽">⚽</option>
+            <option value="🎓">🎓</option>
+            <option value="💡">💡</option>
+            <option value="🚀">🚀</option>
+            <option value="🔥">🔥</option>
+            <option value="⭐">⭐</option>
+            <option value="💎">💎</option>
+            <option value="🏆">🏆</option>
+            <option value="💻">💻</option>
+            <option value="📱">📱</option>
+            <option value="🎨">🎨</option>
+            <option value="🛠️">🛠️</option>
+            <option value="🚗">🚗</option>
+            <option value="📦">📦</option>
+            <option value="🌐">🌐</option>
+            <option value="📊">📊</option>
+            <option value="📢">📢</option>
+            <option value="☕">☕</option>
+            <option value="⚡">⚡</option>
+            <option value="🔑">🔑</option>
+            <option value="🏷️">🏷️</option>
+            <option value="📌">📌</option>
+          </select>
         </div>
         <button type="submit" class="btn-primary" id="btnCatSubmit" style="height:38px;">+</button>
       </div>
@@ -976,20 +998,10 @@ async function loadCategories(){
   updateCategoryDropdown();
 }
 
-function renderIconDisplay(iconVal) {
-  if (!iconVal) return '👤';
-  const trimmed = iconVal.trim();
-  // Vérifie si c'est une URL d'image en ligne (http/https ou base64)
-  if (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('data:image/')) {
-    return `<img src="${escapeAttr(trimmed)}" class="cat-icon-render" alt="icône" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'16\' height=\'16\'><text y=\'14\' font-size=\'14\'>👤</text></svg>';">`;
-  }
-  return escapeHtml(trimmed);
-}
-
 function updateCategoryDropdown(){
   const select = document.getElementById('fCategory');
   select.innerHTML = userCategories.map(c => `
-    <option value="${escapeAttr(c.name)}">${c.icon ? (c.icon.startsWith('http') ? '🖼️' : c.icon) : '👤'} ${escapeHtml(c.name)}</option>
+    <option value="${escapeAttr(c.name)}">${c.icon || '👤'} ${escapeHtml(c.name)}</option>
   `).join('');
 }
 
@@ -1003,7 +1015,7 @@ function renderCategoryModalList(){
     <div class="cat-row-item">
       <div class="cat-row-left">
         <span class="cat-color-preview" style="background:${c.color};"></span>
-        <span style="font-size:16px; display:inline-flex; align-items:center;">${renderIconDisplay(c.icon)}</span>
+        <span style="font-size:16px;">${c.icon || '👤'}</span>
         <strong style="color:var(--ink);">${escapeHtml(c.name)}</strong>
       </div>
       <div style="display:flex; gap:6px;">
@@ -1032,7 +1044,7 @@ function resetCategoryForm(){
   editingCatId = null;
   document.getElementById('newCatName').value = '';
   document.getElementById('newCatColor').value = '#B8874F';
-  document.getElementById('newCatIcon').value = '';
+  document.getElementById('newCatIcon').value = '👤';
   document.getElementById('catModalTitle').textContent = 'Gérer les catégories & icônes';
   document.getElementById('catFormLabel').textContent = 'Ajouter une nouvelle catégorie';
   document.getElementById('btnCatSubmit').textContent = '+';
@@ -1045,8 +1057,7 @@ document.getElementById('addCatForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const name = document.getElementById('newCatName').value.trim();
   const color = document.getElementById('newCatColor').value;
-  let icon = document.getElementById('newCatIcon').value.trim();
-  if(!icon) icon = '👤';
+  const icon = document.getElementById('newCatIcon').value;
 
   if(!name) return;
 
@@ -1088,7 +1099,6 @@ document.getElementById('addCatForm').addEventListener('submit', async (e) => {
       return;
     }
     document.getElementById('newCatName').value = '';
-    document.getElementById('newCatIcon').value = '';
     showToast('Catégorie ajoutée ✓');
   }
 
@@ -1261,7 +1271,7 @@ function renderFilters(){
     html.push(`
       <div class="pill ${activeFilter === c.name ? 'active' : ''}" data-cat="${escapeAttr(c.name)}">
         <span class="dot" style="background:${c.color}"></span>
-        <span style="display:inline-flex; align-items:center;">${renderIconDisplay(c.icon)}</span> ${escapeHtml(c.name)}
+        ${c.icon || '👤'} ${escapeHtml(c.name)}
         <span class="count">${count}</span>
       </div>
     `);
@@ -1344,7 +1354,7 @@ function renderList(){
             <div class="card-name-row">
               <span class="card-name">${escapeHtml(p.name)}</span>
               <span class="badge" style="background:${catCfg.color}22; color:${catCfg.color}; border:1px solid ${catCfg.color}44;">
-                <span style="display:inline-flex; align-items:center;">${renderIconDisplay(catCfg.icon)}</span> ${escapeHtml(p.category)}
+                ${catCfg.icon || '👤'} ${escapeHtml(p.category)}
               </span>
               <span class="badge" style="background:${sc.bg}; color:${sc.fg};">
                 ${escapeHtml(p.status)}
