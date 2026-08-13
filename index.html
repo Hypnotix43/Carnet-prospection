@@ -167,6 +167,7 @@ h1{
 .header-actions {
   display: flex;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
 /* ---------- Stats ---------- */
@@ -684,6 +685,7 @@ h1{
     </div>
     <div class="header-actions">
       <button class="btn-ghost" id="btnCategories">⚙️ Catégories</button>
+      <button class="btn-ghost" id="btnLogout" style="color: var(--danger); border-color: var(--line);">Déconnexion</button>
       <button class="btn-primary" id="btnAdd">+ Ajouter un prospect</button>
     </div>
   </div>
@@ -783,8 +785,8 @@ h1{
 
 <div class="overlay" id="categoryOverlay">
   <div class="modal">
-    <h2>Gérer les catégories & icônes</h2>
-    <p style="font-size: 13px; color: var(--slate); margin-top: -10px; margin-bottom: 16px;">
+    <h2 id="catModalTitle">Gérer les catégories & icônes</h2>
+    <p style="font-size: 13px; color: var(--slate); margin-top: -10px; margin-bottom: 16px;" id="catModalSub">
       Personnalisez vos catégories avec des couleurs et des icônes uniques.
     </p>
 
@@ -792,7 +794,7 @@ h1{
 
     <form id="addCatForm" style="border-top:1px solid var(--line); padding-top:14px;">
       <div class="field" style="margin-bottom:8px;">
-        <label>Ajouter une nouvelle catégorie</label>
+        <label id="catFormLabel">Ajouter une nouvelle catégorie</label>
       </div>
       <div class="field-row" style="gap:8px;">
         <div class="field" style="flex:2; margin-bottom:0;">
@@ -814,11 +816,11 @@ h1{
             <option value="⚽">⚽</option>
             <option value="🎓">🎓</option>
             <option value="💡">💡</option>
-            <option value="💼">💼</option>
           </select>
         </div>
-        <button type="submit" class="btn-primary" style="height:38px;">+</button>
+        <button type="submit" class="btn-primary" id="btnCatSubmit" style="height:38px;">+</button>
       </div>
+      <button type="button" class="btn-ghost" id="btnCancelEditCat" style="display:none; width:100%; margin-top:8px;">Annuler la modification</button>
     </form>
 
     <div class="modal-actions" style="margin-top:20px;">
@@ -845,6 +847,7 @@ let currentUser = null;
 let prospects = [];
 let userCategories = [];
 let editingId = null;
+let editingCatId = null;
 let activeFilter = 'all';
 let searchTerm = '';
 let sortMode = 'followup';
@@ -937,6 +940,19 @@ document.getElementById('loginPassword').addEventListener('keydown', (e)=>{
   if(e.key === 'Enter') handleAuth();
 });
 
+// --- DÉCONNEXION ---
+document.getElementById('btnLogout').addEventListener('click', async () => {
+  if (!confirm('Voulez-vous vraiment vous déconnecter ?')) return;
+  await supabaseClient.auth.signOut();
+  currentUser = null;
+  prospects = [];
+  userCategories = [];
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('loginEmail').value = '';
+  document.getElementById('loginPassword').value = '';
+  showToast('Déconnecté avec succès');
+});
+
 async function initDefaultCategories(){
   for(let cat of DEFAULT_CATEGORIES){
     await supabaseClient.from('categories').insert([{
@@ -983,10 +999,40 @@ function renderCategoryModalList(){
         <span style="font-size:16px;">${c.icon || '👤'}</span>
         <strong style="color:var(--ink);">${escapeHtml(c.name)}</strong>
       </div>
-      <button type="button" class="icon-btn danger" onclick="deleteCategory('${c.id}')" style="padding:4px 8px; font-size:11px;">Supprimer</button>
+      <div style="display:flex; gap:6px;">
+        <button type="button" class="icon-btn" onclick="startEditCategory('${c.id}')" style="padding:4px 8px; font-size:11px;">Modifier</button>
+        <button type="button" class="icon-btn danger" onclick="deleteCategory('${c.id}')" style="padding:4px 8px; font-size:11px;">Supprimer</button>
+      </div>
     </div>
   `).join('');
 }
+
+function startEditCategory(id){
+  const cat = userCategories.find(c => c.id === id);
+  if(!cat) return;
+  editingCatId = id;
+  document.getElementById('newCatName').value = cat.name;
+  document.getElementById('newCatColor').value = cat.color || '#B8874F';
+  document.getElementById('newCatIcon').value = cat.icon || '👤';
+  
+  document.getElementById('catModalTitle').textContent = 'Modifier la catégorie';
+  document.getElementById('catFormLabel').textContent = 'Modifier la catégorie sélectionnée';
+  document.getElementById('btnCatSubmit').textContent = '✓';
+  document.getElementById('btnCancelEditCat').style.display = 'block';
+}
+
+function resetCategoryForm(){
+  editingCatId = null;
+  document.getElementById('newCatName').value = '';
+  document.getElementById('newCatColor').value = '#B8874F';
+  document.getElementById('newCatIcon').value = '👤';
+  document.getElementById('catModalTitle').textContent = 'Gérer les catégories & icônes';
+  document.getElementById('catFormLabel').textContent = 'Ajouter une nouvelle catégorie';
+  document.getElementById('btnCatSubmit').textContent = '+';
+  document.getElementById('btnCancelEditCat').style.display = 'none';
+}
+
+document.getElementById('btnCancelEditCat').addEventListener('click', resetCategoryForm);
 
 document.getElementById('addCatForm').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -996,23 +1042,50 @@ document.getElementById('addCatForm').addEventListener('submit', async (e) => {
 
   if(!name) return;
 
-  const { error } = await supabaseClient.from('categories').insert([{
-    user_id: currentUser.id,
-    name,
-    color,
-    icon
-  }]);
+  if(editingCatId){
+    const oldCat = userCategories.find(c => c.id === editingCatId);
+    const oldName = oldCat ? oldCat.name : null;
 
-  if(error){
-    showToast('⚠️ Erreur lors de l’ajout de la catégorie');
-    return;
+    const { error } = await supabaseClient
+      .from('categories')
+      .update({ name, color, icon })
+      .eq('id', editingCatId);
+
+    if(error){
+      showToast('⚠️ Erreur lors de la modification');
+      return;
+    }
+
+    if(oldName && oldName !== name){
+      for(let p of prospects){
+        if(p.category === oldName){
+          p.category = name;
+          await saveSingleProspect(p);
+        }
+      }
+    }
+
+    showToast('Catégorie modifiée ✓');
+    resetCategoryForm();
+  } else {
+    const { error } = await supabaseClient.from('categories').insert([{
+      user_id: currentUser.id,
+      name,
+      color,
+      icon
+    }]);
+
+    if(error){
+      showToast('⚠️ Cette catégorie existe déjà ou une erreur est survenue');
+      return;
+    }
+    document.getElementById('newCatName').value = '';
+    showToast('Catégorie ajoutée ✓');
   }
 
-  document.getElementById('newCatName').value = '';
   await loadCategories();
   renderCategoryModalList();
   render();
-  showToast('Catégorie ajoutée ✓');
 });
 
 async function deleteCategory(id){
@@ -1035,6 +1108,7 @@ async function deleteCategory(id){
 
 const catOverlay = document.getElementById('categoryOverlay');
 document.getElementById('btnCategories').addEventListener('click', () => {
+  resetCategoryForm();
   renderCategoryModalList();
   catOverlay.classList.add('open');
 });
