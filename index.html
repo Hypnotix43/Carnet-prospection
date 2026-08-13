@@ -33,6 +33,15 @@ body{
   min-height:100vh;
 }
 
+/* ---------- Top Bar / Floating Logout ---------- */
+
+.top-bar-right {
+  position: absolute;
+  top: 20px;
+  right: clamp(20px, 4vw, 56px);
+  z-index: 40;
+}
+
 /* ---------- Login ---------- */
 
 #loginScreen{
@@ -110,6 +119,7 @@ body{
   border-bottom:1px solid var(--line);
   padding:32px clamp(20px,4vw,56px) 24px;
   background:var(--paper-raised);
+  position: relative;
 }
 
 .masthead-inner{
@@ -643,6 +653,10 @@ h1{
     flex-direction:column;
     gap:0;
   }
+  .top-bar-right {
+    top: 15px;
+    right: 16px;
+  }
 }
 </style>
 </head>
@@ -674,6 +688,10 @@ h1{
 
 <!-- ==================== HEADER ==================== -->
 
+<div class="top-bar-right">
+  <button class="btn-ghost" id="btnLogout" style="color: var(--danger); border-color: var(--line); background: var(--paper-raised);">Déconnexion</button>
+</div>
+
 <header class="masthead">
   <div class="masthead-inner">
     <div>
@@ -685,7 +703,6 @@ h1{
     </div>
     <div class="header-actions">
       <button class="btn-ghost" id="btnCategories">⚙️ Catégories</button>
-      <button class="btn-ghost" id="btnLogout" style="color: var(--danger); border-color: var(--line);">Déconnexion</button>
       <button class="btn-primary" id="btnAdd">+ Ajouter un prospect</button>
     </div>
   </div>
