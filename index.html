@@ -1246,96 +1246,53 @@ async function loadProspects(){
 
 /* ==================== SAVE ==================== */
 
-async function saveProspect(prospect){
-
-  if(!currentUser) return false;
-
-
-  const row = {
-
-    id: prospect.id,
-
-    user_id: currentUser.id,
-
-    name: prospect.name,
-
-    phone: prospect.phone || '',
-
-    email: prospect.email || '',
-
-    category:
-      prospect.category || 'Autres',
-
-    status:
-      prospect.status || 'À contacter',
-
-    followup:
-      prospect.followup || null,
-
-    notes:
-      prospect.notes || ''
-
-  };
-
-
-  if(prospect.created_at){
-
-    row.created_at =
-      prospect.created_at;
-
-  }
-
-
-  const { error } =
-    await supabaseClient
-
-      .from('prospects')
-
-      .upsert(
-        row,
-        {
-          onConflict:'id'
-        }
-      );
-
-
-  if(error){
-
-    console.error(
-      'Erreur sauvegarde:',
-      error
-    );
-
-    showToast(
-      '⚠️ Erreur de sauvegarde'
-    );
-
+async function saveProspects() {
+  if (!currentUser) {
+    showToast('⚠️ Utilisateur non connecté');
     return false;
   }
 
+  try {
+    const rows = prospects.map(p => ({
+      id: p.id,
+      user_id: currentUser.id,
+      name: p.name,
+      phone: p.phone || '',
+      email: p.email || '',
+      category: p.category || 'Autres',
+      status: p.status || 'À contacter',
+      followup: p.followup || null,
+      notes: p.notes || '',
+      created_at: p.created_at || new Date().toISOString()
+    }));
 
-  return true;
+    const { data, error } = await supabaseClient
+      .from('prospects')
+      .upsert(rows, {
+        onConflict: 'id'
+      })
+      .select();
 
-}
+    if (error) {
+      console.error('ERREUR SUPABASE:', error);
+      console.error('Code:', error.code);
+      console.error('Message:', error.message);
+      console.error('Details:', error.details);
+      console.error('Hint:', error.hint);
 
+      showToast('⚠️ ' + error.message);
+      return false;
+    }
 
-/* ==================== CATEGORIES ==================== */
+    console.log('Prospects sauvegardés:', data);
+    showToast('Sauvegardé dans le cloud ✓');
+    return true;
 
-function allCategories(){
-
-  const used = [
-    ...new Set(
-      prospects.map(p=>p.category)
-    )
-  ];
-
-  return [
-    ...new Set([
-      ...DEFAULT_CATEGORIES,
-      ...used
-    ])
-  ];
-
+  } catch (error) {
+    console.error('ERREUR INATTENDUE:', error);
+    showToast('⚠️ Erreur de sauvegarde');
+    return false;
+  }
 }
 
 
