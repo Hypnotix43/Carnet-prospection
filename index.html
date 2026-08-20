@@ -785,7 +785,10 @@ h1{
 
       <div class="field">
         <label for="fCategory">Catégorie *</label>
-        <select id="fCategory" required></select>
+        <div style="display:flex; gap:8px;">
+          <select id="fCategory" required style="flex:1;"></select>
+          <button type="button" class="icon-btn" id="btnQuickAddCat" title="Ajouter une catégorie" style="padding:0 12px; font-size:16px; font-weight:bold;">+</button>
+        </div>
       </div>
 
       <div class="field-row">
@@ -907,7 +910,7 @@ let userCategories = [];
 let editingId = null;
 let editingCatId = null;
 let activeFilter = 'all';
-let activeStatusFilter = 'all'; // Nouveau filtre interactif basé sur les boutons stats
+let activeStatusFilter = 'all';
 let searchTerm = '';
 let sortMode = 'followup';
 let isSignUpMode = false;
@@ -1001,7 +1004,6 @@ document.getElementById('loginPassword').addEventListener('keydown', (e)=>{
   if(e.key === 'Enter') handleAuth();
 });
 
-// --- DÉCONNEXION ---
 document.getElementById('btnLogout').addEventListener('click', async () => {
   if (!confirm('Voulez-vous vraiment vous déconnecter ?')) return;
   await supabaseClient.auth.signOut();
@@ -1040,10 +1042,10 @@ async function loadCategories(){
   updateCategoryDropdown();
 }
 
-function updateCategoryDropdown(){
+function updateCategoryDropdown(selectedVal = ''){
   const select = document.getElementById('fCategory');
   select.innerHTML = userCategories.map(c => `
-    <option value="${escapeAttr(c.name)}">${c.icon || '🤝'} ${escapeHtml(c.name)}</option>
+    <option value="${escapeAttr(c.name)}"${c.name === selectedVal ? ' selected' : ''}>${c.icon || '🤝'} ${escapeHtml(c.name)}</option>
   `).join('');
 }
 
@@ -1177,6 +1179,13 @@ document.getElementById('btnCatDone').addEventListener('click', () => {
   catOverlay.classList.remove('open');
 });
 
+// Bouton "+" rapide à côté du select de catégorie dans le modal prospect
+document.getElementById('btnQuickAddCat').addEventListener('click', () => {
+  resetCategoryForm();
+  renderCategoryModalList();
+  catOverlay.classList.add('open');
+});
+
 /* ==================== HELPERS ==================== */
 
 function getCategoryConfig(catName){
@@ -1304,7 +1313,7 @@ function renderStats(){
     card.addEventListener('click', () => {
       const statusKey = card.dataset.status;
       if (activeStatusFilter === statusKey) {
-        activeStatusFilter = 'all'; // Recliquer pour désactiver le filtre de statut
+        activeStatusFilter = 'all';
       } else {
         activeStatusFilter = statusKey;
       }
@@ -1344,12 +1353,10 @@ function renderFilters(){
 function getFiltered(){
   let list = [...prospects];
   
-  // Filtrage par catégorie
   if(activeFilter !== 'all'){
     list = list.filter(p=>p.category === activeFilter);
   }
 
-  // Filtrage combiné par statut (via les cartes stats interactives)
   if(activeStatusFilter !== 'all'){
     if(activeStatusFilter === 'overdue'){
       list = list.filter(p => p.followup && daysUntil(p.followup) < 0 && p.status !== 'Client actif' && p.status !== 'Pas intéressé');
@@ -1358,7 +1365,6 @@ function getFiltered(){
     }
   }
 
-  // Recherche textuelle
   if(searchTerm){
     const s = searchTerm.toLowerCase();
     list = list.filter(p=>
@@ -1476,8 +1482,7 @@ function openEdit(id){
   document.getElementById('fPhone').value = p.phone || '';
   document.getElementById('fEmail').value = p.email || '';
   
-  updateCategoryDropdown();
-  document.getElementById('fCategory').value = p.category || '';
+  updateCategoryDropdown(p.category);
   document.getElementById('fStatus').value = p.status || 'À contacter';
   document.getElementById('fFollowup').value = p.followup || '';
   document.getElementById('fNotes').value = p.notes || '';
