@@ -796,8 +796,11 @@ h1{
           <label for="fStatus">Statut</label>
           <select id="fStatus">
             <option>À contacter</option>
+            <option>Contacté</option>
             <option>Rendez-vous fixé</option>
+            <option>Proposition envoyée</option>
             <option>Client actif</option>
+            <option>Pas intéressé</option>
           </select>
         </div>
         <div class="field">
@@ -1176,6 +1179,7 @@ document.getElementById('btnCatDone').addEventListener('click', () => {
   catOverlay.classList.remove('open');
 });
 
+// Bouton "+" rapide à côté du select de catégorie dans le modal prospect
 document.getElementById('btnQuickAddCat').addEventListener('click', () => {
   resetCategoryForm();
   renderCategoryModalList();
@@ -1218,8 +1222,11 @@ function formatDate(dateStr){
 
 const STATUS_COLORS = {
   'À contacter': {bg:'#EFEEE9', fg:'#5A5F6B'},
+  'Contacté': {bg:'#E3EDF6', fg:'#2E5F8A'},
   'Rendez-vous fixé': {bg:'#F3E7D4', fg:'#8F6A3B'},
-  'Client actif': {bg:'#E2EFE4', fg:'#3C6B47'}
+  'Proposition envoyée': {bg:'#EEE3F0', fg:'#7C4A8F'},
+  'Client actif': {bg:'#E2EFE4', fg:'#3C6B47'},
+  'Pas intéressé': {bg:'#F3E2DF', fg:'#A0473A'}
 };
 
 /* ==================== PROSPECTS DATA ==================== */
@@ -1284,7 +1291,7 @@ function renderStats(){
   const rdv = prospects.filter(p=>p.status === 'Rendez-vous fixé').length;
   const clients = prospects.filter(p=>p.status === 'Client actif').length;
   const overdue = prospects.filter(
-      p => p.followup && daysUntil(p.followup) < 0 && p.status !== 'Client actif'
+      p => p.followup && daysUntil(p.followup) < 0 && p.status !== 'Client actif' && p.status !== 'Pas intéressé'
   ).length;
 
   const stats = [
@@ -1352,7 +1359,7 @@ function getFiltered(){
 
   if(activeStatusFilter !== 'all'){
     if(activeStatusFilter === 'overdue'){
-      list = list.filter(p => p.followup && daysUntil(p.followup) < 0 && p.status !== 'Client actif');
+      list = list.filter(p => p.followup && daysUntil(p.followup) < 0 && p.status !== 'Client actif' && p.status !== 'Pas intéressé');
     } else {
       list = list.filter(p => p.status === activeStatusFilter);
     }
@@ -1412,7 +1419,7 @@ function renderList(){
       const sc = STATUS_COLORS[p.status] || STATUS_COLORS['À contacter'];
       const catCfg = getCategoryConfig(p.category);
       const dUntil = daysUntil(p.followup);
-      const overdue = dUntil !== null && dUntil < 0 && p.status !== 'Client actif';
+      const overdue = dUntil !== null && dUntil < 0 && p.status !== 'Client actif' && p.status !== 'Pas intéressé';
 
       return `
         <div class="card" data-id="${escapeAttr(p.id)}">
