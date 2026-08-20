@@ -283,48 +283,15 @@ h1{
   font-size:14px;
 }
 
-/* ---------- Sort Bar / Sort Pills ---------- */
-
-.sort-container {
-  max-width: 1180px;
-  margin: 16px auto 0;
-  padding: 0 clamp(20px, 4vw, 56px);
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  align-items: center;
-}
-
-.sort-label-txt {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--slate);
-  margin-right: 4px;
-}
-
-.sort-pill {
-  border: 1px solid var(--line);
-  background: var(--paper-raised);
-  border-radius: 999px;
-  padding: 6px 14px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--ink-soft);
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  transition: border-color .15s ease, background .15s ease;
-}
-
-.sort-pill:hover {
-  border-color: var(--gold);
-}
-
-.sort-pill.active {
-  background: var(--gold-dark);
-  border-color: var(--gold-dark);
-  color: #fff;
+.sort-wrap select{
+  padding:10px 14px;
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  font-family:'Inter';
+  font-size:14px;
+  background:var(--paper-raised);
+  color:var(--ink);
+  cursor:pointer;
 }
 
 /* ---------- Filters ---------- */
@@ -637,7 +604,7 @@ h1{
   color:var(--ink);
 }
 
-/* Category Manager Styles */
+/* Category & Status Manager Styles */
 .cat-list {
   display: flex;
   flex-direction: column;
@@ -767,6 +734,7 @@ h1{
     </div>
     <div class="header-actions">
       <button class="btn-ghost" id="btnCategories">⚙️ Catégories</button>
+      <button class="btn-ghost" id="btnStatuses">⚙️ Statuts</button>
       <button class="btn-primary" id="btnAdd">+ Ajouter un prospect</button>
     </div>
   </div>
@@ -783,14 +751,14 @@ h1{
     <span class="search-icon">🔍</span>
     <input type="text" id="searchInput" placeholder="Rechercher un nom, téléphone, courriel...">
   </div>
-</div>
-
-<!-- ==================== SORT PILLS ==================== -->
-
-<div class="sort-container" id="sortContainer">
-  <span class="sort-label-txt">Trier par :</span>
-  <div id="sortPillsRow" style="display:flex; gap:6px; flex-wrap:wrap; align-items:center; flex:1;"></div>
-  <button class="icon-btn" id="btnSortConfig" title="Gérer les boutons de tri">⚙️ Tri</button>
+  <div class="sort-wrap">
+    <select id="sortSelect">
+      <option value="followup">📅 Trier : Prochain suivi</option>
+      <option value="name">🔤 Trier : Nom (A-Z)</option>
+      <option value="recent">⏱️ Trier : Ajoutés récemment</option>
+      <option value="status">📊 Trier : Statut</option>
+    </select>
+  </div>
 </div>
 
 <!-- ==================== FILTERS ==================== -->
@@ -804,7 +772,7 @@ h1{
 <div class="list-wrap" id="listWrap"></div>
 
 <p class="footer-note">
-  Vos données et catégories sont enregistrées dans le cloud et liées à votre compte.
+  Vos données, catégories et statuts sont enregistrés dans le cloud et liés à votre compte.
 </p>
 
 <!-- ==================== PROSPECT MODAL ==================== -->
@@ -840,14 +808,7 @@ h1{
       <div class="field-row">
         <div class="field">
           <label for="fStatus">Statut</label>
-          <select id="fStatus">
-            <option>À contacter</option>
-            <option>Contacté</option>
-            <option>Rendez-vous fixé</option>
-            <option>Proposition envoyée</option>
-            <option>Client actif</option>
-            <option>Pas intéressé</option>
-          </select>
+          <select id="fStatus"></select>
         </div>
         <div class="field">
           <label for="fFollowup">Prochain suivi</label>
@@ -873,8 +834,8 @@ h1{
 <div class="overlay" id="categoryOverlay">
   <div class="modal">
     <h2 id="catModalTitle">Gérer les catégories & icônes</h2>
-    <p style="font-size: 13px; color: var(--slate); margin-top: -10px; margin-bottom: 16px;" id="catModalSub">
-      Personnalisez vos catégories avec des couleurs et des icônes de relations sociales.
+    <p style="font-size: 13px; color: var(--slate); margin-top: -10px; margin-bottom: 16px;">
+      Personnalisez vos catégories avec des couleurs et des icônes.
     </p>
 
     <div class="cat-list" id="customCatList"></div>
@@ -935,40 +896,38 @@ h1{
   </div>
 </div>
 
-<!-- ==================== SORT CONFIG MODAL ==================== -->
+<!-- ==================== STATUS MODAL ==================== -->
 
-<div class="overlay" id="sortConfigOverlay">
+<div class="overlay" id="statusOverlay">
   <div class="modal">
-    <h2 id="sortModalTitle">Gérer les options de tri</h2>
+    <h2 id="statusModalTitle">Gérer les statuts</h2>
     <p style="font-size: 13px; color: var(--slate); margin-top: -10px; margin-bottom: 16px;">
-      Ajoutez, modifiez ou supprimez vos boutons de tri. Les identifiants internes correspondent aux logiques de tri (ex: followup, name, recent, status).
+      Personnalisez vos statuts de prospects ainsi que leurs couleurs d'affichage.
     </p>
 
-    <div class="cat-list" id="customSortList"></div>
+    <div class="cat-list" id="customStatusList"></div>
 
-    <form id="addSortForm" style="border-top:1px solid var(--line); padding-top:14px;">
+    <form id="addStatusForm" style="border-top:1px solid var(--line); padding-top:14px;">
       <div class="field" style="margin-bottom:8px;">
-        <label id="sortFormLabel">Ajouter un nouveau critère de tri</label>
+        <label id="statusFormLabel">Ajouter un nouveau statut</label>
       </div>
       <div class="field-row" style="gap:8px;">
-        <div class="field" style="flex:1; margin-bottom:0;">
-          <input type="text" id="newSortLabel" placeholder="Libellé (ex: Par nom)" required>
+        <div class="field" style="flex:2; margin-bottom:0;">
+          <input type="text" id="newStatusName" placeholder="Nom du statut" required>
         </div>
-        <div class="field" style="flex:1; margin-bottom:0;">
-          <select id="newSortValue" style="height:38px;">
-            <option value="followup">Logique : Prochain suivi</option>
-            <option value="name">Logique : Nom alphabétique</option>
-            <option value="recent">Logique : Récemment ajoutés</option>
-            <option value="status">Logique : Statut</option>
-          </select>
+        <div class="field" style="width:60px; margin-bottom:0;" title="Couleur de fond">
+          <input type="color" id="newStatusBg" value="#EFEEE9" style="height:38px; padding:2px; cursor:pointer;">
         </div>
-        <button type="submit" class="btn-primary" id="btnSortSubmit" style="height:38px;">+</button>
+        <div class="field" style="width:60px; margin-bottom:0;" title="Couleur du texte">
+          <input type="color" id="newStatusFg" value="#5A5F6B" style="height:38px; padding:2px; cursor:pointer;">
+        </div>
+        <button type="submit" class="btn-primary" id="btnStatusSubmit" style="height:38px;">+</button>
       </div>
-      <button type="button" class="btn-ghost" id="btnCancelEditSort" style="display:none; width:100%; margin-top:8px;">Annuler la modification</button>
+      <button type="button" class="btn-ghost" id="btnCancelEditStatus" style="display:none; width:100%; margin-top:8px;">Annuler la modification</button>
     </form>
 
     <div class="modal-actions" style="margin-top:20px;">
-      <button type="button" class="btn-ghost" id="btnSortDone">Terminer</button>
+      <button type="button" class="btn-ghost" id="btnStatusDone">Terminer</button>
     </div>
   </div>
 </div>
@@ -990,14 +949,13 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLI
 let currentUser = null;
 let prospects = [];
 let userCategories = [];
-let userSorts = [];
+let userStatuses = [];
 let editingId = null;
 let editingCatId = null;
-let editingSortId = null;
+let editingStatusId = null;
 let activeFilter = 'all';
 let activeStatusFilter = 'all';
 let searchTerm = '';
-let sortMode = 'followup';
 let isSignUpMode = false;
 
 const DEFAULT_CATEGORIES = [
@@ -1011,11 +969,13 @@ const DEFAULT_CATEGORIES = [
   { name: 'Autres', color: '#707B8F', icon: '📌' }
 ];
 
-const DEFAULT_SORTS = [
-  { label: 'Prochain suivi', sort_key: 'followup' },
-  { label: 'Nom', sort_key: 'name' },
-  { label: 'Récents', sort_key: 'recent' },
-  { label: 'Statut', sort_key: 'status' }
+const DEFAULT_STATUSES = [
+  { name: 'À contacter', bg: '#EFEEE9', fg: '#5A5F6B' },
+  { name: 'Contacté', bg: '#E3EDF6', fg: '#2E5F8A' },
+  { name: 'Rendez-vous fixé', bg: '#F3E7D4', fg: '#8F6A3B' },
+  { name: 'Proposition envoyée', bg: '#EEE3F0', fg: '#7C4A8F' },
+  { name: 'Client actif', bg: '#E2EFE4', fg: '#3C6B47' },
+  { name: 'Pas intéressé', bg: '#F3E2DF', fg: '#A0473A' }
 ];
 
 /* ==================== AUTH ==================== */
@@ -1031,7 +991,7 @@ async function checkAuth(){
   document.getElementById('loginScreen').style.display = 'none';
   
   await loadCategories();
-  await loadSorts();
+  await loadStatuses();
   await loadProspects();
   return true;
 }
@@ -1072,9 +1032,9 @@ async function handleAuth(){
     currentUser = data.user;
     document.getElementById('loginScreen').style.display = 'none';
     await initDefaultCategories();
-    await initDefaultSorts();
+    await initDefaultStatuses();
     await loadCategories();
-    await loadSorts();
+    await loadStatuses();
     await loadProspects();
   } else {
     const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
@@ -1090,10 +1050,10 @@ async function handleAuth(){
       await initDefaultCategories();
       await loadCategories();
     }
-    await loadSorts();
-    if(userSorts.length === 0){
-      await initDefaultSorts();
-      await loadSorts();
+    await loadStatuses();
+    if(userStatuses.length === 0){
+      await initDefaultStatuses();
+      await loadStatuses();
     }
     await loadProspects();
   }
@@ -1110,7 +1070,7 @@ document.getElementById('btnLogout').addEventListener('click', async () => {
   currentUser = null;
   prospects = [];
   userCategories = [];
-  userSorts = [];
+  userStatuses = [];
   document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('loginEmail').value = '';
   document.getElementById('loginPassword').value = '';
@@ -1128,163 +1088,16 @@ async function initDefaultCategories(){
   }
 }
 
-async function initDefaultSorts(){
-  for(let s of DEFAULT_SORTS){
-    await supabaseClient.from('user_sorts').insert([{
+async function initDefaultStatuses(){
+  for(let st of DEFAULT_STATUSES){
+    await supabaseClient.from('statuses').insert([{
       user_id: currentUser.id,
-      label: s.label,
-      sort_key: s.sort_key
+      name: st.name,
+      bg: st.bg,
+      fg: st.fg
     }]);
   }
 }
-
-/* ==================== SORTS CONFIG (SUPABASE) ==================== */
-
-async function loadSorts(){
-  if(!currentUser) return;
-  const { data, error } = await supabaseClient
-    .from('user_sorts')
-    .select('*')
-    .eq('user_id', currentUser.id);
-
-  if(!error && data){
-    userSorts = data;
-  }
-  renderSortPills();
-}
-
-function renderSortPills(){
-  const row = document.getElementById('sortPillsRow');
-  if(userSorts.length === 0){
-    row.innerHTML = `<span style="font-size:13px; color:var(--slate);">Aucun tri défini</span>`;
-    return;
-  }
-  row.innerHTML = userSorts.map(s => `
-    <button type="button" class="sort-pill ${sortMode === s.sort_key ? 'active' : ''}" data-key="${escapeAttr(s.sort_key)}">
-      ${escapeHtml(s.label)}
-    </button>
-  `).join('');
-
-  row.querySelectorAll('.sort-pill').forEach(btn => {
-    btn.addEventListener('click', () => {
-      sortMode = btn.dataset.key;
-      renderSortPills();
-      renderList();
-    });
-  });
-}
-
-function renderSortModalList(){
-  const list = document.getElementById('customSortList');
-  if(userSorts.length === 0){
-    list.innerHTML = `<div style="text-align:center; color:var(--slate); font-size:13px; padding:10px;">Aucun tri</div>`;
-    return;
-  }
-  list.innerHTML = userSorts.map(s => `
-    <div class="cat-row-item">
-      <div class="cat-row-left">
-        <strong style="color:var(--ink);">${escapeHtml(s.label)}</strong>
-        <span style="font-size:12px; color:var(--slate);">(${escapeHtml(s.sort_key)})</span>
-      </div>
-      <div style="display:flex; gap:6px;">
-        <button type="button" class="icon-btn" onclick="startEditSort('${s.id}')" style="padding:4px 8px; font-size:11px;">Modifier</button>
-        <button type="button" class="icon-btn danger" onclick="deleteSort('${s.id}')" style="padding:4px 8px; font-size:11px;">Supprimer</button>
-      </div>
-    </div>
-  `).join('');
-}
-
-function startEditSort(id){
-  const s = userSorts.find(item => item.id === id);
-  if(!s) return;
-  editingSortId = id;
-  document.getElementById('newSortLabel').value = s.label;
-  document.getElementById('newSortValue').value = s.sort_key || 'followup';
-  
-  document.getElementById('sortModalTitle').textContent = 'Modifier le tri';
-  document.getElementById('sortFormLabel').textContent = 'Modifier le critère sélectionné';
-  document.getElementById('btnSortSubmit').textContent = '✓';
-  document.getElementById('btnCancelEditSort').style.display = 'block';
-}
-
-function resetSortForm(){
-  editingSortId = null;
-  document.getElementById('newSortLabel').value = '';
-  document.getElementById('newSortValue').value = 'followup';
-  document.getElementById('sortModalTitle').textContent = 'Gérer les options de tri';
-  document.getElementById('sortFormLabel').textContent = 'Ajouter un nouveau critère de tri';
-  document.getElementById('btnSortSubmit').textContent = '+';
-  document.getElementById('btnCancelEditSort').style.display = 'none';
-}
-
-document.getElementById('btnCancelEditSort').addEventListener('click', resetSortForm);
-
-document.getElementById('addSortForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const label = document.getElementById('newSortLabel').value.trim();
-  const sort_key = document.getElementById('newSortValue').value;
-
-  if(!label) return;
-
-  if(editingSortId){
-    const { error } = await supabaseClient
-      .from('user_sorts')
-      .update({ label, sort_key })
-      .eq('id', editingSortId);
-
-    if(error){
-      showToast('⚠️ Erreur lors de la modification');
-      return;
-    }
-    showToast('Tri modifié ✓');
-    resetSortForm();
-  } else {
-    const { error } = await supabaseClient.from('user_sorts').insert([{
-      user_id: currentUser.id,
-      label,
-      sort_key
-    }]);
-
-    if(error){
-      showToast('⚠️ Erreur lors de l’ajout');
-      return;
-    }
-    document.getElementById('newSortLabel').value = '';
-    showToast('Tri ajouté ✓');
-  }
-
-  await loadSorts();
-  renderSortModalList();
-  renderList();
-});
-
-async function deleteSort(id){
-  if(userSorts.length <= 1){
-    alert('Vous devez conserver au moins un tri.');
-    return;
-  }
-  if(!confirm('Supprimer ce tri ?')) return;
-
-  const { error } = await supabaseClient.from('user_sorts').delete().eq('id', id);
-  if(error){
-    showToast('⚠️ Erreur de suppression');
-    return;
-  }
-  await loadSorts();
-  renderSortModalList();
-  renderList();
-  showToast('Tri supprimé ✓');
-}
-
-const sortOverlay = document.getElementById('sortConfigOverlay');
-document.getElementById('btnSortConfig').addEventListener('click', () => {
-  resetSortForm();
-  renderSortModalList();
-  sortOverlay.classList.add('open');
-});
-document.getElementById('btnSortDone').addEventListener('click', () => {
-  sortOverlay.classList.remove('open');
-});
 
 /* ==================== CATEGORIES (SUPABASE) ==================== */
 
@@ -1444,11 +1257,166 @@ document.getElementById('btnQuickAddCat').addEventListener('click', () => {
   catOverlay.classList.add('open');
 });
 
+/* ==================== STATUSES (SUPABASE) ==================== */
+
+async function loadStatuses(){
+  if(!currentUser) return;
+  const { data, error } = await supabaseClient
+    .from('statuses')
+    .select('*')
+    .eq('user_id', currentUser.id);
+
+  if(!error && data){
+    userStatuses = data;
+  }
+  updateStatusDropdown();
+}
+
+function updateStatusDropdown(selectedVal = ''){
+  const select = document.getElementById('fStatus');
+  select.innerHTML = userStatuses.map(s => `
+    <option value="${escapeAttr(s.name)}"${s.name === selectedVal ? ' selected' : ''}>${escapeHtml(s.name)}</option>
+  `).join('');
+}
+
+function renderStatusModalList(){
+  const list = document.getElementById('customStatusList');
+  if(userStatuses.length === 0){
+    list.innerHTML = `<div style="text-align:center; color:var(--slate); font-size:13px; padding:10px;">Aucun statut</div>`;
+    return;
+  }
+  list.innerHTML = userStatuses.map(st => `
+    <div class="cat-row-item">
+      <div class="cat-row-left">
+        <span class="badge" style="background:${st.bg}; color:${st.fg};">${escapeHtml(st.name)}</span>
+      </div>
+      <div style="display:flex; gap:6px;">
+        <button type="button" class="icon-btn" onclick="startEditStatus('${st.id}')" style="padding:4px 8px; font-size:11px;">Modifier</button>
+        <button type="button" class="icon-btn danger" onclick="deleteStatus('${st.id}')" style="padding:4px 8px; font-size:11px;">Supprimer</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function startEditStatus(id){
+  const st = userStatuses.find(s => s.id === id);
+  if(!st) return;
+  editingStatusId = id;
+  document.getElementById('newStatusName').value = st.name;
+  document.getElementById('newStatusBg').value = st.bg || '#EFEEE9';
+  document.getElementById('newStatusFg').value = st.fg || '#5A5F6B';
+  
+  document.getElementById('statusModalTitle').textContent = 'Modifier le statut';
+  document.getElementById('statusFormLabel').textContent = 'Modifier le statut sélectionné';
+  document.getElementById('btnStatusSubmit').textContent = '✓';
+  document.getElementById('btnCancelEditStatus').style.display = 'block';
+}
+
+function resetStatusForm(){
+  editingStatusId = null;
+  document.getElementById('newStatusName').value = '';
+  document.getElementById('newStatusBg').value = '#EFEEE9';
+  document.getElementById('newStatusFg').value = '#5A5F6B';
+  document.getElementById('statusModalTitle').textContent = 'Gérer les statuts';
+  document.getElementById('statusFormLabel').textContent = 'Ajouter un nouveau statut';
+  document.getElementById('btnStatusSubmit').textContent = '+';
+  document.getElementById('btnCancelEditStatus').style.display = 'none';
+}
+
+document.getElementById('btnCancelEditStatus').addEventListener('click', resetStatusForm);
+
+document.getElementById('addStatusForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name = document.getElementById('newStatusName').value.trim();
+  const bg = document.getElementById('newStatusBg').value;
+  const fg = document.getElementById('newStatusFg').value;
+
+  if(!name) return;
+
+  if(editingStatusId){
+    const oldSt = userStatuses.find(s => s.id === editingStatusId);
+    const oldName = oldSt ? oldSt.name : null;
+
+    const { error } = await supabaseClient
+      .from('statuses')
+      .update({ name, bg, fg })
+      .eq('id', editingStatusId);
+
+    if(error){
+      showToast('⚠️ Erreur lors de la modification');
+      return;
+    }
+
+    if(oldName && oldName !== name){
+      for(let p of prospects){
+        if(p.status === oldName){
+          p.status = name;
+          await saveSingleProspect(p);
+        }
+      }
+    }
+
+    showToast('Statut modifié ✓');
+    resetStatusForm();
+  } else {
+    const { error } = await supabaseClient.from('statuses').insert([{
+      user_id: currentUser.id,
+      name,
+      bg,
+      fg
+    }]);
+
+    if(error){
+      showToast('⚠️ Ce statut existe déjà ou une erreur est survenue');
+      return;
+    }
+    document.getElementById('newStatusName').value = '';
+    showToast('Statut ajouté ✓');
+  }
+
+  await loadStatuses();
+  renderStatusModalList();
+  render();
+});
+
+async function deleteStatus(id){
+  if(userStatuses.length <= 1){
+    alert('Vous devez conserver au moins un statut.');
+    return;
+  }
+  if(!confirm('Supprimer ce statut ?')) return;
+
+  const { error } = await supabaseClient.from('statuses').delete().eq('id', id);
+  if(error){
+    showToast('⚠️ Erreur de suppression');
+    return;
+  }
+  await loadStatuses();
+  renderStatusModalList();
+  render();
+  showToast('Statut supprimé ✓');
+}
+
+const statusOverlay = document.getElementById('statusOverlay');
+document.getElementById('btnStatuses').addEventListener('click', () => {
+  resetStatusForm();
+  renderStatusModalList();
+  statusOverlay.classList.add('open');
+});
+document.getElementById('btnStatusDone').addEventListener('click', () => {
+  statusOverlay.classList.remove('open');
+});
+
 /* ==================== HELPERS ==================== */
 
 function getCategoryConfig(catName){
   const found = userCategories.find(c => c.name === catName);
   return found || { color: '#B8874F', icon: '🤝' };
+}
+
+function getStatusConfig(statusName){
+  const found = userStatuses.find(s => s.name === statusName);
+  return found || { bg: '#EFEEE9', fg: '#5A5F6B' };
 }
 
 function showToast(msg){
@@ -1477,15 +1445,6 @@ function formatDate(dateStr){
   const d = new Date(dateStr + 'T00:00:00');
   return d.toLocaleDateString('fr-CA', {day:'numeric', month:'short', year:'numeric'});
 }
-
-const STATUS_COLORS = {
-  'À contacter': {bg:'#EFEEE9', fg:'#5A5F6B'},
-  'Contacté': {bg:'#E3EDF6', fg:'#2E5F8A'},
-  'Rendez-vous fixé': {bg:'#F3E7D4', fg:'#8F6A3B'},
-  'Proposition envoyée': {bg:'#EEE3F0', fg:'#7C4A8F'},
-  'Client actif': {bg:'#E2EFE4', fg:'#3C6B47'},
-  'Pas intéressé': {bg:'#F3E2DF', fg:'#A0473A'}
-};
 
 /* ==================== PROSPECTS DATA ==================== */
 
@@ -1540,29 +1499,30 @@ async function saveSingleProspect(p) {
 function render(){
   renderStats();
   renderFilters();
-  renderSortPills();
   renderList();
 }
 
 function renderStats(){
   const total = prospects.length;
-  const aContacter = prospects.filter(p=>p.status === 'À contacter').length;
-  const rdv = prospects.filter(p=>p.status === 'Rendez-vous fixé').length;
-  const clients = prospects.filter(p=>p.status === 'Client actif').length;
+  
+  // Compter dynamiquement les cartes de statuts basées sur userStatuses
+  const stats = [
+    { label: 'Prospects au total', val: total, filterKey: 'all' }
+  ];
+
+  userStatuses.forEach(st => {
+    const count = prospects.filter(p => p.status === st.name).length;
+    stats.push({ label: st.name, val: count, filterKey: st.name, customBg: st.bg, customFg: st.fg });
+  });
+
   const overdue = prospects.filter(
       p => p.followup && daysUntil(p.followup) < 0 && p.status !== 'Client actif' && p.status !== 'Pas intéressé'
   ).length;
 
-  const stats = [
-    { label:'Prospects au total', val:total, filterKey:'all' },
-    { label:'À contacter', val:aContacter, filterKey:'À contacter' },
-    { label:'Rendez-vous fixés', val:rdv, filterKey:'Rendez-vous fixé' },
-    { label:'Clients actifs', val:clients, filterKey:'Client actif' },
-    { label:'Suivis en retard', val:overdue, alert:overdue > 0, filterKey:'overdue' }
-  ];
+  stats.push({ label: 'Suivis en retard', val: overdue, alert: overdue > 0, filterKey: 'overdue' });
 
-  document.getElementById('statsRow').innerHTML = stats.map(s=>`
-      <div class="stat-card ${s.alert ? 'alert' : ''} ${activeStatusFilter === s.filterKey ? 'active-stat' : ''}" data-status="${s.filterKey}">
+  document.getElementById('statsRow').innerHTML = stats.map(s => `
+      <div class="stat-card ${s.alert ? 'alert' : ''} ${activeStatusFilter === s.filterKey ? 'active-stat' : ''}" data-status="${escapeAttr(s.filterKey)}">
         <div class="stat-num">${s.val}</div>
         <div class="stat-label">${s.label}</div>
       </div>
@@ -1634,6 +1594,7 @@ function getFiltered(){
     );
   }
 
+  const sortMode = document.getElementById('sortSelect').value;
   if(sortMode === 'followup'){
     list.sort((a,b)=>{
       if(!a.followup && !b.followup) return 0;
@@ -1656,6 +1617,10 @@ document.getElementById('searchInput').addEventListener('input', (e) => {
   renderList();
 });
 
+document.getElementById('sortSelect').addEventListener('change', () => {
+  renderList();
+});
+
 function renderList(){
   const list = getFiltered();
   const wrap = document.getElementById('listWrap');
@@ -1670,7 +1635,7 @@ function renderList(){
   }
 
   wrap.innerHTML = list.map(p=>{
-      const sc = STATUS_COLORS[p.status] || STATUS_COLORS['À contacter'];
+      const sc = getStatusConfig(p.status);
       const catCfg = getCategoryConfig(p.category);
       const dUntil = daysUntil(p.followup);
       const overdue = dUntil !== null && dUntil < 0 && p.status !== 'Client actif' && p.status !== 'Pas intéressé';
@@ -1720,8 +1685,8 @@ function openAdd(){
   editingId = null;
   document.getElementById('modalTitle').textContent = 'Ajouter un prospect';
   document.getElementById('prospectForm').reset();
-  document.getElementById('fStatus').value = 'À contacter';
   updateCategoryDropdown();
+  updateStatusDropdown(userStatuses.length > 0 ? userStatuses[0].name : '');
   overlay.classList.add('open');
   document.getElementById('fName').focus();
 }
@@ -1737,7 +1702,7 @@ function openEdit(id){
   document.getElementById('fEmail').value = p.email || '';
   
   updateCategoryDropdown(p.category);
-  document.getElementById('fStatus').value = p.status || 'À contacter';
+  updateStatusDropdown(p.status);
   document.getElementById('fFollowup').value = p.followup || '';
   document.getElementById('fNotes').value = p.notes || '';
   overlay.classList.add('open');
@@ -1756,7 +1721,7 @@ document.getElementById('prospectForm').addEventListener('submit', async e=>{
     phone: document.getElementById('fPhone').value.trim(),
     email: document.getElementById('fEmail').value.trim(),
     category: document.getElementById('fCategory').value.trim() || 'Autres',
-    status: document.getElementById('fStatus').value,
+    status: document.getElementById('fStatus').value || (userStatuses.length > 0 ? userStatuses[0].name : 'À contacter'),
     followup: document.getElementById('fFollowup').value || null,
     notes: document.getElementById('fNotes').value.trim()
   };
