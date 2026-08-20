@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Carnet de prospection</title>
 
 <style>
@@ -24,9 +23,7 @@
   --radius:10px;
 }
 
-*{
-  box-sizing:border-box;
-}
+*{box-sizing:border-box;}
 
 body{
   margin:0;
@@ -36,14 +33,93 @@ body{
   min-height:100vh;
 }
 
-/* =========================
-   HEADER
-========================= */
+/* ---------- Top Bar / Floating Logout ---------- */
+
+.top-bar-right {
+  position: absolute;
+  top: 20px;
+  right: clamp(20px, 4vw, 56px);
+  z-index: 40;
+}
+
+/* ---------- Login ---------- */
+
+#loginScreen{
+  position:fixed;
+  inset:0;
+  background:var(--paper);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+  padding:20px;
+}
+
+.login-box{
+  width:100%;
+  max-width:400px;
+  background:white;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:30px;
+}
+
+.login-box h2{
+  font-family:'Fraunces',serif;
+  color:var(--ink);
+  margin:0 0 20px;
+}
+
+.login-field{
+  margin-bottom:14px;
+}
+
+.login-field label{
+  display:block;
+  font-size:13px;
+  font-weight:600;
+  margin-bottom:5px;
+}
+
+.login-field input{
+  width:100%;
+  padding:10px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  font-family:'Inter';
+}
+
+#loginError{
+  color:var(--danger);
+  font-size:13px;
+  margin-top:12px;
+  display:none;
+}
+
+.auth-toggle {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 13px;
+}
+
+.auth-toggle a {
+  color: var(--ink-soft);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.auth-toggle a:hover {
+  text-decoration: underline;
+  color: var(--gold-dark);
+}
+
+/* ---------- Header ---------- */
 
 .masthead{
   border-bottom:1px solid var(--line);
   padding:32px clamp(20px,4vw,56px) 24px;
   background:var(--paper-raised);
+  position: relative;
 }
 
 .masthead-inner{
@@ -56,27 +132,19 @@ body{
   flex-wrap:wrap;
 }
 
-.eyebrow{
-  font-size:11px;
-  letter-spacing:.14em;
-  text-transform:uppercase;
-  color:var(--gold-dark);
-  font-weight:600;
-  margin-bottom:6px;
-}
-
 h1{
   font-family:'Fraunces',serif;
   font-weight:600;
   font-size:clamp(28px,4vw,38px);
   margin:0;
+  letter-spacing:-.01em;
 }
 
 .tagline{
   color:var(--slate);
   font-size:14.5px;
   margin-top:6px;
-  max-width:620px;
+  max-width:520px;
   line-height:1.5;
 }
 
@@ -94,7 +162,7 @@ h1{
   align-items:center;
   justify-content:center;
   gap:8px;
-  transition:.15s ease;
+  transition:background .15s ease, transform .1s ease;
   white-space:nowrap;
 }
 
@@ -106,16 +174,20 @@ h1{
   transform:scale(.98);
 }
 
-/* =========================
-   STATS
-========================= */
+.header-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* ---------- Stats (Interactive) ---------- */
 
 .stats-row{
   max-width:1180px;
   margin:24px auto 0;
   padding:0 clamp(20px,4vw,56px);
   display:grid;
-  grid-template-columns:repeat(4,1fr);
+  grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
   gap:14px;
 }
 
@@ -125,34 +197,26 @@ h1{
   border-radius:var(--radius);
   padding:16px 18px;
   cursor:pointer;
-  transition:
-    transform .15s ease,
-    border-color .15s ease,
-    box-shadow .15s ease,
-    background .15s ease;
-  user-select:none;
+  transition:all .15s ease;
 }
 
 .stat-card:hover{
-  transform:translateY(-2px);
   border-color:var(--gold);
-  box-shadow:0 5px 16px rgba(27,42,69,.08);
+  transform: translateY(-2px);
 }
 
-.stat-card.active{
+.stat-card.active-stat{
   border-color:var(--ink);
-  background:var(--gold-tint);
-  box-shadow:0 0 0 2px rgba(184,135,79,.15);
+  background:var(--ink);
 }
 
-.stat-card.alert .stat-num{
-  color:var(--danger);
+.stat-card.active-stat .stat-num,
+.stat-card.active-stat .stat-label{
+  color:#fff;
 }
 
-.stat-card.alert.active{
-  border-color:var(--danger);
-  background:#F3E2DF;
-  box-shadow:0 0 0 2px rgba(178,75,60,.12);
+.stat-card.active-stat.alert .stat-num{
+  color:#ff9999;
 }
 
 .stat-num{
@@ -170,15 +234,11 @@ h1{
   letter-spacing:.06em;
 }
 
-.stat-hint{
-  font-size:10px;
-  color:var(--slate);
-  margin-top:5px;
+.stat-card.alert .stat-num{
+  color:var(--danger);
 }
 
-/* =========================
-   CONTROLS
-========================= */
+/* ---------- Controls ---------- */
 
 .controls{
   max-width:1180px;
@@ -195,7 +255,7 @@ h1{
   position:relative;
   flex:1;
   min-width:220px;
-  max-width:420px;
+  max-width:360px;
 }
 
 .search-wrap input{
@@ -231,49 +291,9 @@ h1{
   font-family:'Inter';
   font-size:13.5px;
   color:var(--ink-soft);
-  cursor:pointer;
 }
 
-/* =========================
-   ACTIVE FILTER DISPLAY
-========================= */
-
-.active-filters{
-  max-width:1180px;
-  margin:14px auto 0;
-  padding:0 clamp(20px,4vw,56px);
-  min-height:0;
-}
-
-.active-filter-box{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  flex-wrap:wrap;
-  font-size:12px;
-  color:var(--slate);
-}
-
-.active-filter-label{
-  font-weight:600;
-  color:var(--ink-soft);
-}
-
-.filter-tag{
-  display:inline-flex;
-  align-items:center;
-  gap:5px;
-  padding:5px 9px;
-  border-radius:999px;
-  background:var(--gold-tint);
-  color:var(--gold-dark);
-  font-size:11.5px;
-  font-weight:600;
-}
-
-/* =========================
-   CATEGORY FILTERS
-========================= */
+/* ---------- Filters ---------- */
 
 .filters{
   max-width:1180px;
@@ -296,8 +316,7 @@ h1{
   display:flex;
   align-items:center;
   gap:7px;
-  transition:.15s ease;
-  user-select:none;
+  transition:border-color .15s ease, background .15s ease;
 }
 
 .pill:hover{
@@ -322,9 +341,7 @@ h1{
   opacity:.75;
 }
 
-/* =========================
-   LIST
-========================= */
+/* ---------- List ---------- */
 
 .list-wrap{
   max-width:1180px;
@@ -364,14 +381,14 @@ h1{
 }
 
 .badge{
-  font-size:11px;
+  font-size:11.5px;
   font-weight:600;
-  padding:3px 9px;
+  padding:4px 10px;
   border-radius:999px;
   letter-spacing:.02em;
   display:inline-flex;
   align-items:center;
-  gap:5px;
+  gap:6px;
 }
 
 .card-contact{
@@ -458,10 +475,6 @@ h1{
   color:var(--danger);
 }
 
-/* =========================
-   EMPTY STATE
-========================= */
-
 .empty-state{
   text-align:center;
   padding:60px 20px;
@@ -475,12 +488,10 @@ h1{
   font-family:'Fraunces',serif;
   color:var(--ink);
   font-size:19px;
-  margin:0 0 6px;
+  margin-bottom:6px;
 }
 
-/* =========================
-   MODAL
-========================= */
+/* ---------- Modals ---------- */
 
 .overlay{
   position:fixed;
@@ -547,7 +558,7 @@ h1{
 
 .field textarea{
   resize:vertical;
-  min-height:80px;
+  min-height:60px;
 }
 
 .field-row{
@@ -583,74 +594,38 @@ h1{
   color:var(--ink);
 }
 
-/* =========================
-   LOGIN
-========================= */
-
-#loginScreen{
-  position:fixed;
-  inset:0;
-  background:#FAF7F0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  z-index:9999;
-  padding:20px;
+/* Category Manager Styles */
+.cat-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+.cat-row-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--paper);
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  font-size: 14px;
+}
+.cat-row-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.cat-color-preview {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: inline-block;
 }
 
-.login-box{
-  width:100%;
-  max-width:400px;
-  background:white;
-  border:1px solid #E4DFD1;
-  border-radius:14px;
-  padding:30px;
-}
-
-.login-eyebrow{
-  font-size:11px;
-  letter-spacing:.14em;
-  text-transform:uppercase;
-  color:#8F6A3B;
-  font-weight:600;
-  margin-bottom:6px;
-}
-
-.login-box h2{
-  font-family:Georgia,serif;
-  color:#1B2A45;
-  margin:0 0 20px;
-}
-
-.login-field{
-  margin-bottom:14px;
-}
-
-.login-field label{
-  display:block;
-  font-size:13px;
-  font-weight:600;
-  margin-bottom:5px;
-}
-
-.login-field input{
-  width:100%;
-  padding:10px;
-  border:1px solid #E4DFD1;
-  border-radius:8px;
-  font-family:Inter,sans-serif;
-}
-
-.login-error{
-  color:#B24B3C;
-  font-size:13px;
-  margin-top:12px;
-  display:none;
-}
-
-/* =========================
-   TOAST
-========================= */
+/* ---------- Toast ---------- */
 
 .toast{
   position:fixed;
@@ -663,7 +638,7 @@ h1{
   border-radius:8px;
   font-size:13.5px;
   opacity:0;
-  transition:.2s ease;
+  transition:opacity .2s ease, transform .2s ease;
   pointer-events:none;
   z-index:60;
 }
@@ -673,9 +648,7 @@ h1{
   transform:translateX(-50%) translateY(0);
 }
 
-/* =========================
-   FOOTER
-========================= */
+/* ---------- Footer ---------- */
 
 .footer-note{
   max-width:1180px;
@@ -685,2349 +658,916 @@ h1{
   color:var(--slate);
 }
 
-/* =========================
-   RESPONSIVE
-========================= */
-
-@media(max-width:900px){
-
-  .stats-row{
-    grid-template-columns:repeat(2,1fr);
-  }
-
-}
+/* ---------- Mobile ---------- */
 
 @media(max-width:640px){
-
-  .stats-row{
-    grid-template-columns:1fr 1fr;
-    gap:8px;
-  }
-
-  .stat-card{
-    padding:13px;
-  }
-
-  .stat-num{
-    font-size:23px;
-  }
-
-  .stat-label{
-    font-size:10px;
-  }
-
   .card{
     flex-direction:column;
   }
-
   .card-side{
     align-items:flex-start;
     width:100%;
     flex-direction:row;
     justify-content:space-between;
   }
-
   .field-row{
     flex-direction:column;
     gap:0;
   }
-
-}
-
-@media(max-width:430px){
-
-  .stats-row{
-    grid-template-columns:1fr 1fr;
+  .top-bar-right {
+    top: 15px;
+    right: 16px;
   }
-
-  .card-side{
-    flex-direction:column;
-  }
-
 }
 </style>
 </head>
 
 <body>
 
-<!-- =========================
-     LOGIN
-========================= -->
+<!-- ==================== LOGIN / SIGNUP ==================== -->
 
 <div id="loginScreen">
-
   <div class="login-box">
-
-    <div class="login-eyebrow">
-      Assurance &amp; placement — Québec
-    </div>
-
-    <h2>Connexion</h2>
-
+    <h2 id="authTitle">Connexion</h2>
     <div class="login-field">
-
-      <label for="loginEmail">
-        Courriel
-      </label>
-
-      <input
-        type="email"
-        id="loginEmail"
-        autocomplete="email"
-      >
-
+      <label for="loginEmail">Courriel</label>
+      <input type="email" id="loginEmail" autocomplete="email">
     </div>
-
     <div class="login-field">
-
-      <label for="loginPassword">
-        Mot de passe
-      </label>
-
-      <input
-        type="password"
-        id="loginPassword"
-        autocomplete="current-password"
-      >
-
+      <label for="loginPassword">Mot de passe</label>
+      <input type="password" id="loginPassword" autocomplete="current-password">
     </div>
-
-    <button
-      id="loginButton"
-      class="btn-primary"
-      style="width:100%;"
-    >
+    <button id="loginButton" class="btn-primary" style="width:100%;">
       Se connecter
     </button>
-
-    <div
-      id="loginError"
-      class="login-error"
-    ></div>
-
+    <div class="auth-toggle">
+      <a href="#" id="toggleAuth">Pas encore de compte ? Créer un compte</a>
+    </div>
+    <div id="loginError"></div>
   </div>
-
 </div>
 
+<!-- ==================== HEADER ==================== -->
 
-<!-- =========================
-     HEADER
-========================= -->
+<div class="top-bar-right">
+  <button class="btn-ghost" id="btnLogout" style="color: var(--danger); border-color: var(--line); background: var(--paper-raised);">Déconnexion</button>
+</div>
 
 <header class="masthead">
-
   <div class="masthead-inner">
-
     <div>
-
-      <div class="eyebrow">
-        Assurance &amp; placement — Québec
-      </div>
-
-      <h1>
-        Carnet de prospection
-      </h1>
-
+      <h1>Carnet de prospection</h1>
       <p class="tagline">
         Tous vos contacts, classés selon d'où vous les connaissez,
         avec vos suivis à jour — enregistrés automatiquement.
       </p>
-
     </div>
-
-    <button
-      class="btn-primary"
-      id="btnAdd"
-    >
-      + Ajouter un prospect
-    </button>
-
+    <div class="header-actions">
+      <button class="btn-ghost" id="btnCategories">⚙️ Catégories</button>
+      <button class="btn-primary" id="btnAdd">+ Ajouter un prospect</button>
+    </div>
   </div>
-
 </header>
 
+<!-- ==================== STATS ==================== -->
 
-<!-- =========================
-     STATS
-========================= -->
+<div class="stats-row" id="statsRow"></div>
 
-<div
-  class="stats-row"
-  id="statsRow"
-></div>
-
-
-<!-- =========================
-     SEARCH / SORT
-========================= -->
+<!-- ==================== SEARCH / SORT ==================== -->
 
 <div class="controls">
-
   <div class="search-wrap">
-
-    <span class="search-icon">
-      🔍
-    </span>
-
-    <input
-      type="text"
-      id="searchInput"
-      placeholder="Rechercher un nom, téléphone, courriel..."
-    >
-
+    <span class="search-icon">🔍</span>
+    <input type="text" id="searchInput" placeholder="Rechercher un nom, téléphone, courriel...">
   </div>
 
-  <select
-    class="sort-select"
-    id="sortSelect"
-  >
-
-    <option value="followup">
-      Trier par prochain suivi
-    </option>
-
-    <option value="name">
-      Trier par nom
-    </option>
-
-    <option value="recent">
-      Ajoutés récemment
-    </option>
-
-    <option value="status">
-      Trier par statut
-    </option>
-
+  <select class="sort-select" id="sortSelect">
+    <option value="followup">Trier par prochain suivi</option>
+    <option value="name">Trier par nom</option>
+    <option value="recent">Ajoutés récemment</option>
+    <option value="status">Trier par statut</option>
   </select>
-
 </div>
 
+<!-- ==================== FILTERS ==================== -->
 
-<!-- =========================
-     ACTIVE FILTERS
-========================= -->
+<div class="filters" id="filtersRow"></div>
 
-<div
-  class="active-filters"
-  id="activeFilters"
-></div>
+<!-- ==================== LIST ==================== -->
 
-
-<!-- =========================
-     CATEGORY FILTERS
-========================= -->
-
-<div
-  class="filters"
-  id="filtersRow"
-></div>
-
-
-<!-- =========================
-     PROSPECT LIST
-========================= -->
-
-<div
-  class="list-wrap"
-  id="listWrap"
-></div>
-
+<div class="list-wrap" id="listWrap"></div>
 
 <p class="footer-note">
-  Vos données sont enregistrées automatiquement et liées à votre compte.
+  Vos données et catégories sont enregistrées dans le cloud et liées à votre compte.
 </p>
 
+<!-- ==================== PROSPECT MODAL ==================== -->
 
-<!-- =========================
-     MODAL
-========================= -->
-
-<div
-  class="overlay"
-  id="overlay"
->
-
+<div class="overlay" id="overlay">
   <div class="modal">
-
-    <h2 id="modalTitle">
-      Ajouter un prospect
-    </h2>
-
+    <h2 id="modalTitle">Ajouter un prospect</h2>
     <form id="prospectForm">
-
       <div class="field">
-
-        <label for="fName">
-          Nom complet *
-        </label>
-
-        <input
-          type="text"
-          id="fName"
-          required
-        >
-
+        <label for="fName">Nom complet *</label>
+        <input type="text" id="fName" required>
       </div>
-
 
       <div class="field-row">
-
         <div class="field">
-
-          <label for="fPhone">
-            Téléphone
-          </label>
-
-          <input
-            type="tel"
-            id="fPhone"
-            placeholder="514 555-0123"
-          >
-
+          <label for="fPhone">Téléphone</label>
+          <input type="tel" id="fPhone" placeholder="514 555-0123">
         </div>
-
         <div class="field">
-
-          <label for="fEmail">
-            Courriel
-          </label>
-
-          <input
-            type="email"
-            id="fEmail"
-            placeholder="nom@exemple.com"
-          >
-
+          <label for="fEmail">Courriel</label>
+          <input type="email" id="fEmail" placeholder="nom@exemple.com">
         </div>
-
       </div>
-
 
       <div class="field">
-
-        <label for="fCategory">
-          D'où le/la connaissez-vous ? *
-        </label>
-
-        <input
-          type="text"
-          id="fCategory"
-          list="categoryList"
-          required
-          placeholder="Famille, ami, collègue, voisin..."
-        >
-
-        <datalist id="categoryList"></datalist>
-
+        <label for="fCategory">Catégorie *</label>
+        <select id="fCategory" required></select>
       </div>
 
-
       <div class="field-row">
-
         <div class="field">
-
-          <label for="fStatus">
-            Statut
-          </label>
-
+          <label for="fStatus">Statut</label>
           <select id="fStatus">
-
             <option>À contacter</option>
             <option>Contacté</option>
             <option>Rendez-vous fixé</option>
             <option>Proposition envoyée</option>
             <option>Client actif</option>
             <option>Pas intéressé</option>
-
           </select>
-
         </div>
-
-
         <div class="field">
-
-          <label for="fFollowup">
-            Prochain suivi
-          </label>
-
-          <input
-            type="date"
-            id="fFollowup"
-          >
-
+          <label for="fFollowup">Prochain suivi</label>
+          <input type="date" id="fFollowup">
         </div>
-
       </div>
-
 
       <div class="field">
-
-        <label for="fNotes">
-          Notes
-        </label>
-
-        <textarea
-          id="fNotes"
-          placeholder="Contexte, besoins, produits d'intérêt..."
-        ></textarea>
-
+        <label for="fNotes">Notes</label>
+        <textarea id="fNotes" placeholder="Contexte, besoins, produits d'intérêt..."></textarea>
       </div>
-
 
       <div class="modal-actions">
-
-        <button
-          type="button"
-          class="btn-ghost"
-          id="btnCancel"
-        >
-          Annuler
-        </button>
-
-        <button
-          type="submit"
-          class="btn-primary"
-          id="btnSave"
-        >
-          Enregistrer
-        </button>
-
+        <button type="button" class="btn-ghost" id="btnCancel">Annuler</button>
+        <button type="submit" class="btn-primary" id="btnSave">Enregistrer</button>
       </div>
-
     </form>
-
   </div>
-
 </div>
 
+<!-- ==================== CATEGORY MODAL ==================== -->
 
-<div
-  class="toast"
-  id="toast"
-></div>
+<div class="overlay" id="categoryOverlay">
+  <div class="modal">
+    <h2 id="catModalTitle">Gérer les catégories & icônes</h2>
+    <p style="font-size: 13px; color: var(--slate); margin-top: -10px; margin-bottom: 16px;" id="catModalSub">
+      Personnalisez vos catégories avec des couleurs et des icônes de relations sociales.
+    </p>
 
+    <div class="cat-list" id="customCatList"></div>
 
-<!-- =========================
-     SUPABASE
-========================= -->
+    <form id="addCatForm" style="border-top:1px solid var(--line); padding-top:14px;">
+      <div class="field" style="margin-bottom:8px;">
+        <label id="catFormLabel">Ajouter une nouvelle catégorie</label>
+      </div>
+      <div class="field-row" style="gap:8px;">
+        <div class="field" style="flex:2; margin-bottom:0;">
+          <input type="text" id="newCatName" placeholder="Nom de la catégorie" required>
+        </div>
+        <div class="field" style="width:60px; margin-bottom:0;">
+          <input type="color" id="newCatColor" value="#B8874F" style="height:38px; padding:2px; cursor:pointer;">
+        </div>
+        <div class="field" style="width:75px; margin-bottom:0;">
+          <select id="newCatIcon" style="height:38px;">
+            <!-- Relations & Social Emojis -->
+            <option value="🤝">🤝</option>
+            <option value="👥">👥</option>
+            <option value="👤">👤</option>
+            <option value="🗣️">🗣️</option>
+            <option value="📞">📞</option>
+            <option value="👔">👔</option>
+            <option value="📈">📈</option>
+            <option value="🎓">🎓</option>
+            <option value="👋">👋</option>
+            <option value="🏋️">🏋️</option>
+            <option value="🔴">🔴</option>
+            <option value="👨‍👩‍👧‍👦">👨‍👩‍👧‍👦</option>
+            <option value="❤️">❤️</option>
+            <option value="💸">💸</option>
+            <option value="🙋‍♂️">🙋‍♂️</option>
+            <option value="💪">💪</option>
+            <option value="💬">💬</option>
+            <option value="🌐">🌐</option>
+            <option value="💼">💼</option>
+            <option value="⭐">⭐</option>
+            <option value="🎯">🎯</option>
+            <option value="🏆">🏆</option>
+            <option value="📖">📖</option>
+            <option value="🔥">🔥</option>
+            <option value="💎">💎</option>
+            <option value="☕">☕</option>
+            <option value="🏦">🏦</option>
+            <option value="📌">📌</option>
+            <option value="🏷️">🏷️</option>
+            <option value="🛠️">🛠️</option>
+          </select>
+        </div>
+        <button type="submit" class="btn-primary" id="btnCatSubmit" style="height:38px;">+</button>
+      </div>
+      <button type="button" class="btn-ghost" id="btnCancelEditCat" style="display:none; width:100%; margin-top:8px;">Annuler la modification</button>
+    </form>
+
+    <div class="modal-actions" style="margin-top:20px;">
+      <button type="button" class="btn-ghost" id="btnCatDone">Terminer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== TOAST ==================== -->
+
+<div class="toast" id="toast"></div>
+
+<!-- ==================== SUPABASE ==================== -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
+const SUPABASE_URL = 'https://rydlmsnkttpbnqqhhplk.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_5Gtj4UbjxG7eqgYwFyPW0w_x0yjzUeX';
 
-/* =========================================================
-   SUPABASE
-========================================================= */
-
-const SUPABASE_URL =
-  'https://rydlmsnkttpbnqqhhplk.supabase.co';
-
-const SUPABASE_PUBLISHABLE_KEY =
-  'sb_publishable_5Gtj4UbjxG7eqgYwFyPW0w_x0yjzUeX';
-
-const supabaseClient =
-  window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_PUBLISHABLE_KEY
-  );
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
 let currentUser = null;
-
-
-/* =========================================================
-   VARIABLES
-========================================================= */
-
 let prospects = [];
-
+let userCategories = [];
 let editingId = null;
-
+let editingCatId = null;
 let activeFilter = 'all';
-
-let activeStatusFilter = 'all';
-
+let activeStatusFilter = 'all'; // Nouveau filtre interactif basé sur les boutons stats
 let searchTerm = '';
-
 let sortMode = 'followup';
-
-
-/* =========================================================
-   COULEURS CATÉGORIES
-========================================================= */
-
-const PALETTE = [
-  '#B8874F',
-  '#4A7C59',
-  '#3B6A8F',
-  '#8F5C6B',
-  '#6B7A3E',
-  '#8F6A3B',
-  '#5C6E8F',
-  '#7C5A8F',
-  '#8F4A4A',
-  '#4A8F82'
-];
-
-function colorForCategory(cat){
-
-  let hash = 0;
-
-  for(let i = 0; i < cat.length; i++){
-
-    hash =
-      cat.charCodeAt(i) +
-      ((hash << 5) - hash);
-
-  }
-
-  return PALETTE[
-    Math.abs(hash) % PALETTE.length
-  ];
-}
-
-
-/* =========================================================
-   COULEURS STATUTS
-========================================================= */
-
-const STATUS_COLORS = {
-
-  'À contacter': {
-    bg:'#EFEEE9',
-    fg:'#5A5F6B'
-  },
-
-  'Contacté': {
-    bg:'#E3EDF6',
-    fg:'#2E5F8A'
-  },
-
-  'Rendez-vous fixé': {
-    bg:'#F3E7D4',
-    fg:'#8F6A3B'
-  },
-
-  'Proposition envoyée': {
-    bg:'#EEE3F0',
-    fg:'#7C4A8F'
-  },
-
-  'Client actif': {
-    bg:'#E2EFE4',
-    fg:'#3C6B47'
-  },
-
-  'Pas intéressé': {
-    bg:'#F3E2DF',
-    fg:'#A0473A'
-  }
-
-};
-
-
-/* =========================================================
-   CATÉGORIES PAR DÉFAUT
-========================================================= */
+let isSignUpMode = false;
 
 const DEFAULT_CATEGORIES = [
-
-  'Famille',
-  'Amis',
-  'Collègues de travail',
-  'Anciens clients',
-  'Voisins',
-  'Connaissances / réseau social',
-  'Références de clients',
-  'Loisirs / club sportif',
-  'École / anciens camarades',
-  'Autres'
-
+  { name: 'Famille', color: '#B8874F', icon: '👨‍👩‍👧‍👦' },
+  { name: 'Amis', color: '#4A7C59', icon: '🧑‍🤝‍🧑' },
+  { name: 'Collègues de travail', color: '#3B6A8F', icon: '💼' },
+  { name: 'Anciens clients', color: '#8F5C6B', icon: '⭐' },
+  { name: 'Références', color: '#8F6A3B', icon: '🤝' },
+  { name: 'Réseautage', color: '#7C4A8F', icon: '🌐' },
+  { name: 'Discussions / Contacts', color: '#2E5F8A', icon: '💬' },
+  { name: 'Autres', color: '#707B8F', icon: '📌' }
 ];
 
-
-/* =========================================================
-   UTILITAIRES
-========================================================= */
-
-function showToast(msg){
-
-  const toast =
-    document.getElementById('toast');
-
-  toast.textContent = msg;
-
-  toast.classList.add('show');
-
-  setTimeout(
-    () => toast.classList.remove('show'),
-    2200
-  );
-
-}
-
-
-function escapeHtml(str){
-
-  return String(str ?? '')
-    .replace(
-      /[&<>"']/g,
-      m => ({
-        '&':'&amp;',
-        '<':'&lt;',
-        '>':'&gt;',
-        '"':'&quot;',
-        "'":'&#39;'
-      }[m])
-    );
-
-}
-
-
-function escapeAttr(str){
-
-  return escapeHtml(str);
-
-}
-
-
-function daysUntil(dateStr){
-
-  if(!dateStr)
-    return null;
-
-  const today = new Date();
-
-  today.setHours(0,0,0,0);
-
-  const date =
-    new Date(dateStr + 'T00:00:00');
-
-  return Math.round(
-    (date - today) / 86400000
-  );
-
-}
-
-
-function formatDate(dateStr){
-
-  if(!dateStr)
-    return '—';
-
-  const date =
-    new Date(dateStr + 'T00:00:00');
-
-  return date.toLocaleDateString(
-    'fr-CA',
-    {
-      day:'numeric',
-      month:'short',
-      year:'numeric'
-    }
-  );
-
-}
-
-
-/* =========================================================
-   AUTHENTIFICATION
-========================================================= */
+/* ==================== AUTH ==================== */
 
 async function checkAuth(){
-
-  const {
-    data,
-    error
-  } =
-    await supabaseClient.auth.getUser();
-
+  const { data, error } = await supabaseClient.auth.getUser();
   if(error || !data.user){
-
-    document.getElementById(
-      'loginScreen'
-    ).style.display = 'flex';
-
+    document.getElementById('loginScreen').style.display = 'flex';
     return false;
-
   }
-
+  
   currentUser = data.user;
-
-  document.getElementById(
-    'loginScreen'
-  ).style.display = 'none';
-
+  document.getElementById('loginScreen').style.display = 'none';
+  
+  await loadCategories();
   await loadProspects();
-
   return true;
-
 }
 
+document.getElementById('toggleAuth').addEventListener('click', (e) => {
+  e.preventDefault();
+  isSignUpMode = !isSignUpMode;
+  document.getElementById('authTitle').textContent = isSignUpMode ? "Créer un compte" : "Connexion";
+  document.getElementById('loginButton').textContent = isSignUpMode ? "S'inscrire" : "Se connecter";
+  e.target.textContent = isSignUpMode ? "Déjà un compte ? Se connecter" : "Pas encore de compte ? Créer un compte";
+});
 
-async function login(){
-
-  const email =
-    document.getElementById(
-      'loginEmail'
-    ).value.trim();
-
-  const password =
-    document.getElementById(
-      'loginPassword'
-    ).value;
-
-  const errorBox =
-    document.getElementById(
-      'loginError'
-    );
-
+async function handleAuth(){
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const errorBox = document.getElementById('loginError');
   errorBox.style.display = 'none';
 
   if(!email || !password){
-
-    errorBox.textContent =
-      'Veuillez entrer votre courriel et votre mot de passe.';
-
+    errorBox.textContent = 'Veuillez entrer votre courriel et votre mot de passe.';
     errorBox.style.display = 'block';
-
     return;
-
   }
 
-  const {
-    data,
-    error
-  } =
-    await supabaseClient.auth
-      .signInWithPassword({
-        email,
-        password
-      });
-
-  if(error){
-
-    errorBox.textContent =
-      'Courriel ou mot de passe incorrect.';
-
-    errorBox.style.display = 'block';
-
-    return;
-
+  if (isSignUpMode) {
+    const { data, error } = await supabaseClient.auth.signUp({ email, password });
+    if(error){
+      errorBox.textContent = error.message;
+      errorBox.style.display = 'block';
+      return;
+    }
+    if (data.user && data.user.identities && data.user.identities.length === 0) {
+      errorBox.textContent = 'Un compte existe déjà avec ce courriel.';
+      errorBox.style.display = 'block';
+      return;
+    }
+    showToast('Compte créé avec succès !');
+    currentUser = data.user;
+    document.getElementById('loginScreen').style.display = 'none';
+    await initDefaultCategories();
+    await loadCategories();
+    await loadProspects();
+  } else {
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    if(error){
+      errorBox.textContent = 'Courriel ou mot de passe incorrect.';
+      errorBox.style.display = 'block';
+      return;
+    }
+    currentUser = data.user;
+    document.getElementById('loginScreen').style.display = 'none';
+    await loadCategories();
+    if(userCategories.length === 0){
+      await initDefaultCategories();
+      await loadCategories();
+    }
+    await loadProspects();
   }
-
-  currentUser = data.user;
-
-  document.getElementById(
-    'loginScreen'
-  ).style.display = 'none';
-
-  await loadProspects();
-
 }
 
+document.getElementById('loginButton').addEventListener('click', handleAuth);
+document.getElementById('loginPassword').addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter') handleAuth();
+});
 
-document
-  .getElementById('loginButton')
-  .addEventListener(
-    'click',
-    login
-  );
+// --- DÉCONNEXION ---
+document.getElementById('btnLogout').addEventListener('click', async () => {
+  if (!confirm('Voulez-vous vraiment vous déconnecter ?')) return;
+  await supabaseClient.auth.signOut();
+  currentUser = null;
+  prospects = [];
+  userCategories = [];
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('loginEmail').value = '';
+  document.getElementById('loginPassword').value = '';
+  showToast('Déconnecté avec succès');
+});
 
+async function initDefaultCategories(){
+  for(let cat of DEFAULT_CATEGORIES){
+    await supabaseClient.from('categories').insert([{
+      user_id: currentUser.id,
+      name: cat.name,
+      color: cat.color,
+      icon: cat.icon
+    }]);
+  }
+}
 
-document
-  .getElementById('loginPassword')
-  .addEventListener(
-    'keydown',
-    e => {
+/* ==================== CATEGORIES (SUPABASE) ==================== */
 
-      if(e.key === 'Enter')
-        login();
+async function loadCategories(){
+  if(!currentUser) return;
+  const { data, error } = await supabaseClient
+    .from('categories')
+    .select('*')
+    .eq('user_id', currentUser.id);
 
+  if(!error && data){
+    userCategories = data;
+  }
+  updateCategoryDropdown();
+}
+
+function updateCategoryDropdown(){
+  const select = document.getElementById('fCategory');
+  select.innerHTML = userCategories.map(c => `
+    <option value="${escapeAttr(c.name)}">${c.icon || '🤝'} ${escapeHtml(c.name)}</option>
+  `).join('');
+}
+
+function renderCategoryModalList(){
+  const list = document.getElementById('customCatList');
+  if(userCategories.length === 0){
+    list.innerHTML = `<div style="text-align:center; color:var(--slate); font-size:13px; padding:10px;">Aucune catégorie</div>`;
+    return;
+  }
+  list.innerHTML = userCategories.map(c => `
+    <div class="cat-row-item">
+      <div class="cat-row-left">
+        <span class="cat-color-preview" style="background:${c.color};"></span>
+        <span style="font-size:16px;">${c.icon || '🤝'}</span>
+        <strong style="color:var(--ink);">${escapeHtml(c.name)}</strong>
+      </div>
+      <div style="display:flex; gap:6px;">
+        <button type="button" class="icon-btn" onclick="startEditCategory('${c.id}')" style="padding:4px 8px; font-size:11px;">Modifier</button>
+        <button type="button" class="icon-btn danger" onclick="deleteCategory('${c.id}')" style="padding:4px 8px; font-size:11px;">Supprimer</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function startEditCategory(id){
+  const cat = userCategories.find(c => c.id === id);
+  if(!cat) return;
+  editingCatId = id;
+  document.getElementById('newCatName').value = cat.name;
+  document.getElementById('newCatColor').value = cat.color || '#B8874F';
+  document.getElementById('newCatIcon').value = cat.icon || '🤝';
+  
+  document.getElementById('catModalTitle').textContent = 'Modifier la catégorie';
+  document.getElementById('catFormLabel').textContent = 'Modifier la catégorie sélectionnée';
+  document.getElementById('btnCatSubmit').textContent = '✓';
+  document.getElementById('btnCancelEditCat').style.display = 'block';
+}
+
+function resetCategoryForm(){
+  editingCatId = null;
+  document.getElementById('newCatName').value = '';
+  document.getElementById('newCatColor').value = '#B8874F';
+  document.getElementById('newCatIcon').value = '🤝';
+  document.getElementById('catModalTitle').textContent = 'Gérer les catégories & icônes';
+  document.getElementById('catFormLabel').textContent = 'Ajouter une nouvelle catégorie';
+  document.getElementById('btnCatSubmit').textContent = '+';
+  document.getElementById('btnCancelEditCat').style.display = 'none';
+}
+
+document.getElementById('btnCancelEditCat').addEventListener('click', resetCategoryForm);
+
+document.getElementById('addCatForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name = document.getElementById('newCatName').value.trim();
+  const color = document.getElementById('newCatColor').value;
+  const icon = document.getElementById('newCatIcon').value;
+
+  if(!name) return;
+
+  if(editingCatId){
+    const oldCat = userCategories.find(c => c.id === editingCatId);
+    const oldName = oldCat ? oldCat.name : null;
+
+    const { error } = await supabaseClient
+      .from('categories')
+      .update({ name, color, icon })
+      .eq('id', editingCatId);
+
+    if(error){
+      showToast('⚠️ Erreur lors de la modification');
+      return;
     }
-  );
 
+    if(oldName && oldName !== name){
+      for(let p of prospects){
+        if(p.category === oldName){
+          p.category = name;
+          await saveSingleProspect(p);
+        }
+      }
+    }
 
-/* =========================================================
-   CHARGER LES PROSPECTS
-========================================================= */
+    showToast('Catégorie modifiée ✓');
+    resetCategoryForm();
+  } else {
+    const { error } = await supabaseClient.from('categories').insert([{
+      user_id: currentUser.id,
+      name,
+      color,
+      icon
+    }]);
+
+    if(error){
+      showToast('⚠️ Cette catégorie existe déjà ou une erreur est survenue');
+      return;
+    }
+    document.getElementById('newCatName').value = '';
+    showToast('Catégorie ajoutée ✓');
+  }
+
+  await loadCategories();
+  renderCategoryModalList();
+  render();
+});
+
+async function deleteCategory(id){
+  if(userCategories.length <= 1){
+    alert('Vous devez conserver au moins une catégorie.');
+    return;
+  }
+  if(!confirm('Supprimer cette catégorie ?')) return;
+
+  const { error } = await supabaseClient.from('categories').delete().eq('id', id);
+  if(error){
+    showToast('⚠️ Erreur de suppression');
+    return;
+  }
+  await loadCategories();
+  renderCategoryModalList();
+  render();
+  showToast('Catégorie supprimée ✓');
+}
+
+const catOverlay = document.getElementById('categoryOverlay');
+document.getElementById('btnCategories').addEventListener('click', () => {
+  resetCategoryForm();
+  renderCategoryModalList();
+  catOverlay.classList.add('open');
+});
+document.getElementById('btnCatDone').addEventListener('click', () => {
+  catOverlay.classList.remove('open');
+});
+
+/* ==================== HELPERS ==================== */
+
+function getCategoryConfig(catName){
+  const found = userCategories.find(c => c.name === catName);
+  return found || { color: '#B8874F', icon: '🤝' };
+}
+
+function showToast(msg){
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(()=>toast.classList.remove('show'), 2200);
+}
+
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+function escapeAttr(str){ return escapeHtml(str); }
+
+function daysUntil(dateStr){
+  if(!dateStr) return null;
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const date = new Date(dateStr + 'T00:00:00');
+  return Math.round((date - today) / 86400000);
+}
+
+function formatDate(dateStr){
+  if(!dateStr) return '—';
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('fr-CA', {day:'numeric', month:'short', year:'numeric'});
+}
+
+const STATUS_COLORS = {
+  'À contacter': {bg:'#EFEEE9', fg:'#5A5F6B'},
+  'Contacté': {bg:'#E3EDF6', fg:'#2E5F8A'},
+  'Rendez-vous fixé': {bg:'#F3E7D4', fg:'#8F6A3B'},
+  'Proposition envoyée': {bg:'#EEE3F0', fg:'#7C4A8F'},
+  'Client actif': {bg:'#E2EFE4', fg:'#3C6B47'},
+  'Pas intéressé': {bg:'#F3E2DF', fg:'#A0473A'}
+};
+
+/* ==================== PROSPECTS DATA ==================== */
 
 async function loadProspects(){
-
-  if(!currentUser)
-    return;
-
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
+  if(!currentUser) return;
+  const { data, error } = await supabaseClient
       .from('prospects')
       .select('*')
       .eq('user_id', currentUser.id)
-      .order(
-        'created_at',
-        {ascending:false}
-      );
+      .order('created_at', { ascending:false });
 
   if(error){
-
-    console.error(
-      'Erreur chargement:',
-      error
-    );
-
-    showToast(
-      '⚠️ Impossible de charger les prospects'
-    );
-
+    console.error('Erreur chargement:', error);
+    showToast('⚠️ Impossible de charger les prospects');
     return;
-
   }
-
   prospects = data || [];
-
   render();
-
 }
 
+async function saveSingleProspect(p) {
+  if (!currentUser) return false;
+  try {
+    const row = {
+      id: p.id,
+      user_id: currentUser.id,
+      name: p.name,
+      phone: p.phone || '',
+      email: p.email || '',
+      category: p.category || 'Autres',
+      status: p.status || 'À contacter',
+      followup: p.followup || null,
+      notes: p.notes || '',
+      created_at: p.created_at || new Date().toISOString()
+    };
 
-/* =========================================================
-   SAUVEGARDE
-========================================================= */
-
-async function saveProspect(prospect){
-
-  if(!currentUser)
+    const { error } = await supabaseClient.from('prospects').upsert(row, { onConflict: 'id' });
+    if (error) {
+      showToast('⚠️ ' + error.message);
+      return false;
+    }
+    showToast('Sauvegardé ✓');
+    return true;
+  } catch (err) {
+    showToast('⚠️ Erreur de sauvegarde');
     return false;
-
-  const row = {
-
-    id: prospect.id,
-
-    user_id: currentUser.id,
-
-    name: prospect.name,
-
-    phone: prospect.phone || null,
-
-    email: prospect.email || null,
-
-    category:
-      prospect.category || 'Autres',
-
-    status:
-      prospect.status || 'À contacter',
-
-    followup:
-      prospect.followup || null,
-
-    notes:
-      prospect.notes || null,
-
-    created_at:
-      prospect.created_at || new Date().toISOString()
-
-  };
-
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .from('prospects')
-      .upsert(
-        row,
-        {
-          onConflict:'id'
-        }
-      )
-      .select()
-      .single();
-
-  if(error){
-
-    console.error(
-      'Erreur sauvegarde:',
-      error
-    );
-
-    showToast(
-      '⚠️ Erreur de sauvegarde'
-    );
-
-    return false;
-
   }
-
-  /* Remplace la version locale par celle de Supabase */
-  const index =
-    prospects.findIndex(
-      p => p.id === prospect.id
-    );
-
-  if(index !== -1)
-    prospects[index] = data;
-
-  return true;
-
 }
 
-
-/* =========================================================
-   SUPPRIMER
-========================================================= */
-
-async function deleteProspect(id){
-
-  const prospect =
-    prospects.find(
-      p => p.id === id
-    );
-
-  if(!prospect)
-    return;
-
-  if(
-    !confirm(
-      `Supprimer ${prospect.name} de votre carnet ?`
-    )
-  )
-    return;
-
-  const {
-    error
-  } =
-    await supabaseClient
-      .from('prospects')
-      .delete()
-      .eq('id', id)
-      .eq('user_id', currentUser.id);
-
-  if(error){
-
-    console.error(
-      'Erreur suppression:',
-      error
-    );
-
-    showToast(
-      '⚠️ Impossible de supprimer le prospect'
-    );
-
-    return;
-
-  }
-
-  prospects =
-    prospects.filter(
-      p => p.id !== id
-    );
-
-  render();
-
-  showToast(
-    'Prospect supprimé ✓'
-  );
-
-}
-
-
-/* =========================================================
-   CATÉGORIES
-========================================================= */
-
-function allCategories(){
-
-  const used =
-    prospects
-      .map(p => p.category)
-      .filter(Boolean);
-
-  return [
-    ...new Set([
-      ...DEFAULT_CATEGORIES,
-      ...used
-    ])
-  ];
-
-}
-
-
-/* =========================================================
-   RENDU PRINCIPAL
-========================================================= */
+/* ==================== RENDER ==================== */
 
 function render(){
-
   renderStats();
-
-  renderActiveFilters();
-
   renderFilters();
-
   renderList();
-
-  renderCategoryDatalist();
-
 }
-
-
-/* =========================================================
-   STATISTIQUES INTERACTIVES
-========================================================= */
 
 function renderStats(){
-
-  /*
-    IMPORTANT :
-    Les statistiques suivent la catégorie sélectionnée.
-    
-    Exemple :
-    Catégorie = Amis
-    
-    → Prospects au total = nombre d'amis
-    → Contactés = nombre d'amis contactés
-    → Clients actifs = nombre de clients actifs parmi les amis
-    etc.
-  */
-
-  let base =
-    [...prospects];
-
-
-  if(activeFilter !== 'all'){
-
-    base =
-      base.filter(
-        p =>
-          p.category === activeFilter
-      );
-
-  }
-
-
-  const total =
-    base.length;
-
-
-  const aContacter =
-    base.filter(
-      p =>
-        p.status === 'À contacter'
-    ).length;
-
-
-  const contactes =
-    base.filter(
-      p =>
-        p.status === 'Contacté'
-    ).length;
-
-
-  const rdv =
-    base.filter(
-      p =>
-        p.status === 'Rendez-vous fixé'
-    ).length;
-
-
-  const propositions =
-    base.filter(
-      p =>
-        p.status === 'Proposition envoyée'
-    ).length;
-
-
-  const clients =
-    base.filter(
-      p =>
-        p.status === 'Client actif'
-    ).length;
-
-
-  const pasInteresse =
-    base.filter(
-      p =>
-        p.status === 'Pas intéressé'
-    ).length;
-
-
-  /*
-    SUIVIS EN RETARD
-    
-    On vérifie uniquement la date.
-    
-    Un prospect est en retard si :
-    - il possède une date de suivi
-    - la date est passée
-    - il n'est pas client actif
-    - il n'est pas "Pas intéressé"
-  */
-
-  const overdue =
-    base.filter(
-      p => {
-
-        const days =
-          daysUntil(p.followup);
-
-        return (
-          days !== null &&
-          days < 0 &&
-          p.status !== 'Client actif' &&
-          p.status !== 'Pas intéressé'
-        );
-
-      }
-    ).length;
-
+  const total = prospects.length;
+  const aContacter = prospects.filter(p=>p.status === 'À contacter').length;
+  const rdv = prospects.filter(p=>p.status === 'Rendez-vous fixé').length;
+  const clients = prospects.filter(p=>p.status === 'Client actif').length;
+  const overdue = prospects.filter(
+      p => p.followup && daysUntil(p.followup) < 0 && p.status !== 'Client actif' && p.status !== 'Pas intéressé'
+  ).length;
 
   const stats = [
-
-    {
-      key:'all',
-      label:'Prospects au total',
-      val:total
-    },
-
-    {
-      key:'À contacter',
-      label:'À contacter',
-      val:aContacter
-    },
-
-    {
-      key:'Contacté',
-      label:'Contactés',
-      val:contactes
-    },
-
-    {
-      key:'Rendez-vous fixé',
-      label:'Rendez-vous fixés',
-      val:rdv
-    },
-
-    {
-      key:'Proposition envoyée',
-      label:'Propositions envoyées',
-      val:propositions
-    },
-
-    {
-      key:'Client actif',
-      label:'Clients actifs',
-      val:clients
-    },
-
-    {
-      key:'Pas intéressé',
-      label:'Pas intéressés',
-      val:pasInteresse
-    },
-
-    {
-      key:'overdue',
-      label:'Suivis en retard',
-      val:overdue,
-      alert:overdue > 0
-    }
-
+    { label:'Prospects au total', val:total, filterKey:'all' },
+    { label:'À contacter', val:aContacter, filterKey:'À contacter' },
+    { label:'Rendez-vous fixés', val:rdv, filterKey:'Rendez-vous fixé' },
+    { label:'Clients actifs', val:clients, filterKey:'Client actif' },
+    { label:'Suivis en retard', val:overdue, alert:overdue > 0, filterKey:'overdue' }
   ];
 
+  document.getElementById('statsRow').innerHTML = stats.map(s=>`
+      <div class="stat-card ${s.alert ? 'alert' : ''} ${activeStatusFilter === s.filterKey ? 'active-stat' : ''}" data-status="${s.filterKey}">
+        <div class="stat-num">${s.val}</div>
+        <div class="stat-label">${s.label}</div>
+      </div>
+    `).join('');
 
-  document.getElementById(
-    'statsRow'
-  ).innerHTML =
-
-    stats.map(
-      stat => `
-
-        <div
-          class="
-            stat-card
-            ${stat.alert ? 'alert' : ''}
-            ${
-              activeStatusFilter === stat.key
-                ? 'active'
-                : ''
-            }
-          "
-          data-status="${escapeAttr(stat.key)}"
-          title="Cliquer pour filtrer"
-        >
-
-          <div class="stat-num">
-            ${stat.val}
-          </div>
-
-          <div class="stat-label">
-            ${stat.label}
-          </div>
-
-          <div class="stat-hint">
-            Cliquer pour filtrer
-          </div>
-
-        </div>
-
-      `
-    ).join('');
-
-
-  /*
-    REND LES CARTES CLIQUABLES
-  */
-
-  document
-    .querySelectorAll('.stat-card')
-    .forEach(card => {
-
-      card.addEventListener(
-        'click',
-        () => {
-
-          const status =
-            card.dataset.status;
-
-
-          /*
-            Si on clique sur le filtre
-            actuellement actif,
-            on le désactive.
-          */
-
-          if(
-            activeStatusFilter === status
-          ){
-
-            activeStatusFilter =
-              'all';
-
-          }else{
-
-            activeStatusFilter =
-              status;
-
-          }
-
-
-          render();
-
-        }
-      );
-
+  document.querySelectorAll('.stat-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const statusKey = card.dataset.status;
+      if (activeStatusFilter === statusKey) {
+        activeStatusFilter = 'all'; // Recliquer pour désactiver le filtre de statut
+      } else {
+        activeStatusFilter = statusKey;
+      }
+      render();
     });
-
+  });
 }
-
-
-/* =========================================================
-   FILTRES ACTIFS
-========================================================= */
-
-function renderActiveFilters(){
-
-  const container =
-    document.getElementById(
-      'activeFilters'
-    );
-
-
-  const tags = [];
-
-
-  if(activeFilter !== 'all'){
-
-    tags.push(
-      `<span class="filter-tag">
-        Catégorie : ${escapeHtml(activeFilter)}
-      </span>`
-    );
-
-  }
-
-
-  if(activeStatusFilter !== 'all'){
-
-    const label =
-      activeStatusFilter === 'overdue'
-        ? 'Suivis en retard'
-        : activeStatusFilter;
-
-    tags.push(
-      `<span class="filter-tag">
-        Statut : ${escapeHtml(label)}
-      </span>`
-    );
-
-  }
-
-
-  if(tags.length === 0){
-
-    container.innerHTML = '';
-
-    return;
-
-  }
-
-
-  container.innerHTML = `
-
-    <div class="active-filter-box">
-
-      <span class="active-filter-label">
-        Filtres actifs :
-      </span>
-
-      ${tags.join('')}
-
-    </div>
-
-  `;
-
-}
-
-
-/* =========================================================
-   FILTRES CATÉGORIES
-========================================================= */
 
 function renderFilters(){
-
-  const cats =
-    allCategories()
-      .filter(
-        c =>
-          prospects.some(
-            p =>
-              p.category === c
-          )
-      );
-
-
   const html = [
-
-    `
-    <div
-      class="pill ${
-        activeFilter === 'all'
-          ? 'active'
-          : ''
-      }"
-      data-cat="all"
-    >
-      Tous
-      <span class="count">
-        ${prospects.length}
-      </span>
-    </div>
-    `
-
+    `<div class="pill ${activeFilter === 'all' ? 'active' : ''}" data-cat="all">
+      Tous <span class="count">${prospects.length}</span>
+    </div>`
   ];
 
-
-  cats.forEach(category => {
-
-    const count =
-      prospects.filter(
-        p =>
-          p.category === category
-      ).length;
-
-
+  userCategories.forEach(c=>{
+    const count = prospects.filter(p=>p.category === c.name).length;
     html.push(`
-
-      <div
-        class="pill ${
-          activeFilter === category
-            ? 'active'
-            : ''
-        }"
-        data-cat="${escapeAttr(category)}"
-      >
-
-        <span
-          class="dot"
-          style="
-            background:${colorForCategory(category)}
-          "
-        ></span>
-
-        ${escapeHtml(category)}
-
-        <span class="count">
-          ${count}
-        </span>
-
+      <div class="pill ${activeFilter === c.name ? 'active' : ''}" data-cat="${escapeAttr(c.name)}">
+        <span class="dot" style="background:${c.color}"></span>
+        ${c.icon || '🤝'} ${escapeHtml(c.name)}
+        <span class="count">${count}</span>
       </div>
-
     `);
-
   });
 
+  document.getElementById('filtersRow').innerHTML = html.join('');
 
-  document.getElementById(
-    'filtersRow'
-  ).innerHTML =
-    html.join('');
-
-
-  document
-    .querySelectorAll('.pill')
-    .forEach(element => {
-
-      element.addEventListener(
-        'click',
-        () => {
-
-          const category =
-            element.dataset.cat;
-
-
-          /*
-            Cliquer une deuxième fois
-            sur la même catégorie
-            enlève le filtre.
-          */
-
-          if(
-            activeFilter === category
-          ){
-
-            activeFilter = 'all';
-
-          }else{
-
-            activeFilter = category;
-
-          }
-
-
-          render();
-
-        }
-      );
-
-    });
-
+  document.querySelectorAll('.pill').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        activeFilter = el.dataset.cat;
+        render();
+      });
+  });
 }
-
-
-/* =========================================================
-   DATALIST CATÉGORIES
-========================================================= */
-
-function renderCategoryDatalist(){
-
-  document.getElementById(
-    'categoryList'
-  ).innerHTML =
-
-    allCategories()
-      .map(
-        category =>
-          `<option value="${escapeAttr(category)}">`
-      )
-      .join('');
-
-}
-
-
-/* =========================================================
-   FILTRAGE + TRI
-========================================================= */
 
 function getFiltered(){
-
-  let list =
-    [...prospects];
-
-
-  /* =========================
-     CATÉGORIE
-  ========================= */
-
+  let list = [...prospects];
+  
+  // Filtrage par catégorie
   if(activeFilter !== 'all'){
-
-    list =
-      list.filter(
-        p =>
-          p.category === activeFilter
-      );
-
+    list = list.filter(p=>p.category === activeFilter);
   }
 
-
-  /* =========================
-     STATUT
-  ========================= */
-
-  if(
-    activeStatusFilter !== 'all'
-  ){
-
-    /*
-      FILTRE SUIVIS EN RETARD
-    */
-
-    if(
-      activeStatusFilter === 'overdue'
-    ){
-
-      list =
-        list.filter(
-          p => {
-
-            const days =
-              daysUntil(
-                p.followup
-              );
-
-            return (
-              days !== null &&
-              days < 0 &&
-              p.status !== 'Client actif' &&
-              p.status !== 'Pas intéressé'
-            );
-
-          }
-        );
-
-
-    }else{
-
-      /*
-        TOUS LES AUTRES STATUTS
-      */
-
-      list =
-        list.filter(
-          p =>
-            p.status ===
-            activeStatusFilter
-        );
-
+  // Filtrage combiné par statut (via les cartes stats interactives)
+  if(activeStatusFilter !== 'all'){
+    if(activeStatusFilter === 'overdue'){
+      list = list.filter(p => p.followup && daysUntil(p.followup) < 0 && p.status !== 'Client actif' && p.status !== 'Pas intéressé');
+    } else {
+      list = list.filter(p => p.status === activeStatusFilter);
     }
-
   }
 
-
-  /* =========================
-     RECHERCHE
-  ========================= */
-
+  // Recherche textuelle
   if(searchTerm){
-
-    const search =
-      searchTerm.toLowerCase();
-
-
-    list =
-      list.filter(
-        p =>
-
-          (p.name || '')
-            .toLowerCase()
-            .includes(search)
-
-          ||
-
-          (p.phone || '')
-            .toLowerCase()
-            .includes(search)
-
-          ||
-
-          (p.email || '')
-            .toLowerCase()
-            .includes(search)
-
-          ||
-
-          (p.notes || '')
-            .toLowerCase()
-            .includes(search)
-
-          ||
-
-          (p.category || '')
-            .toLowerCase()
-            .includes(search)
-
-          ||
-
-          (p.status || '')
-            .toLowerCase()
-            .includes(search)
-
-      );
-
+    const s = searchTerm.toLowerCase();
+    list = list.filter(p=>
+        p.name.toLowerCase().includes(s) ||
+        (p.phone || '').toLowerCase().includes(s) ||
+        (p.email || '').toLowerCase().includes(s) ||
+        (p.notes || '').toLowerCase().includes(s)
+    );
   }
-
-
-  /* =========================
-     TRI
-  ========================= */
 
   if(sortMode === 'followup'){
-
-    list.sort(
-      (a,b) => {
-
-        if(
-          !a.followup &&
-          !b.followup
-        )
-          return 0;
-
-        if(!a.followup)
-          return 1;
-
-        if(!b.followup)
-          return -1;
-
-        return (
-          new Date(a.followup) -
-          new Date(b.followup)
-        );
-
-      }
-    );
-
+    list.sort((a,b)=>{
+      if(!a.followup && !b.followup) return 0;
+      if(!a.followup) return 1;
+      if(!b.followup) return -1;
+      return new Date(a.followup) - new Date(b.followup);
+    });
+  } else if(sortMode === 'name'){
+    list.sort((a,b)=> a.name.localeCompare(b.name, 'fr'));
+  } else if(sortMode === 'recent'){
+    list.sort((a,b)=> new Date(b.created_at) - new Date(a.created_at));
+  } else if(sortMode === 'status'){
+    list.sort((a,b)=> a.status.localeCompare(b.status, 'fr'));
   }
-
-
-  else if(sortMode === 'name'){
-
-    list.sort(
-      (a,b) =>
-
-        (a.name || '')
-          .localeCompare(
-            b.name || '',
-            'fr',
-            {
-              sensitivity:'base'
-            }
-          )
-
-    );
-
-  }
-
-
-  else if(sortMode === 'recent'){
-
-    list.sort(
-      (a,b) =>
-
-        new Date(b.created_at) -
-        new Date(a.created_at)
-
-    );
-
-  }
-
-
-  else if(sortMode === 'status'){
-
-    list.sort(
-      (a,b) =>
-
-        (a.status || '')
-          .localeCompare(
-            b.status || '',
-            'fr',
-            {
-              sensitivity:'base'
-            }
-          )
-
-    );
-
-  }
-
-
   return list;
-
 }
 
+document.getElementById('searchInput').addEventListener('input', (e) => {
+  searchTerm = e.target.value;
+  renderList();
+});
 
-/* =========================================================
-   AFFICHER LA LISTE
-========================================================= */
+document.getElementById('sortSelect').addEventListener('change', (e) => {
+  sortMode = e.target.value;
+  renderList();
+});
 
 function renderList(){
-
-  const list =
-    getFiltered();
-
-  const wrap =
-    document.getElementById(
-      'listWrap'
-    );
-
+  const list = getFiltered();
+  const wrap = document.getElementById('listWrap');
 
   if(list.length === 0){
-
-    let title =
-      'Aucun résultat';
-
-    let text =
-      'Essayez une autre recherche ou un autre filtre.';
-
-
-    if(prospects.length === 0){
-
-      title =
-        'Votre carnet est vide';
-
-      text =
-        'Ajoutez votre premier prospect pour commencer à bâtir votre réseau.';
-
-    }
-
-
     wrap.innerHTML = `
-
       <div class="empty-state">
-
-        <h3>
-          ${title}
-        </h3>
-
-        <p>
-          ${text}
-        </p>
-
-      </div>
-
-    `;
-
+        <h3>${prospects.length === 0 ? 'Votre carnet est vide' : 'Aucun résultat'}</h3>
+        <p>${prospects.length === 0 ? 'Ajoutez votre premier prospect pour commencer.' : 'Essayez une autre recherche.'}</p>
+      </div>`;
     return;
-
   }
 
+  wrap.innerHTML = list.map(p=>{
+      const sc = STATUS_COLORS[p.status] || STATUS_COLORS['À contacter'];
+      const catCfg = getCategoryConfig(p.category);
+      const dUntil = daysUntil(p.followup);
+      const overdue = dUntil !== null && dUntil < 0 && p.status !== 'Client actif' && p.status !== 'Pas intéressé';
 
-  wrap.innerHTML =
-
-    list.map(
-      prospect => {
-
-        const statusColor =
-          STATUS_COLORS[
-            prospect.status
-          ]
-          ||
-          STATUS_COLORS[
-            'À contacter'
-          ];
-
-
-        const categoryColor =
-          colorForCategory(
-            prospect.category
-          );
-
-
-        const days =
-          daysUntil(
-            prospect.followup
-          );
-
-
-        /*
-          DÉTECTION DU RETARD
-        */
-
-        const overdue =
-
-          days !== null &&
-          days < 0 &&
-          prospect.status !== 'Client actif' &&
-          prospect.status !== 'Pas intéressé';
-
-
-        return `
-
-          <div
-            class="card"
-            data-id="${prospect.id}"
-          >
-
-            <div class="card-main">
-
-              <div class="card-name-row">
-
-                <span class="card-name">
-                  ${escapeHtml(prospect.name)}
-                </span>
-
-
-                <span
-                  class="badge"
-                  style="
-                    background:${categoryColor}22;
-                    color:${categoryColor}
-                  "
-                >
-
-                  <span
-                    class="dot"
-                    style="
-                      width:6px;
-                      height:6px;
-                      border-radius:50%;
-                      background:${categoryColor}
-                    "
-                  ></span>
-
-                  ${escapeHtml(
-                    prospect.category
-                  )}
-
-                </span>
-
-
-                <span
-                  class="badge"
-                  style="
-                    background:${statusColor.bg};
-                    color:${statusColor.fg}
-                  "
-                >
-                  ${escapeHtml(
-                    prospect.status
-                  )}
-                </span>
-
-              </div>
-
-
-              <div class="card-contact">
-
-                ${
-                  prospect.phone
-                    ?
-                    `
-                    <a
-                      href="tel:${escapeAttr(prospect.phone)}"
-                    >
-                      📞
-                      ${escapeHtml(prospect.phone)}
-                    </a>
-                    `
-                    :
-                    ''
-                }
-
-
-                ${
-                  prospect.email
-                    ?
-                    `
-                    <a
-                      href="mailto:${escapeAttr(prospect.email)}"
-                    >
-                      ✉️
-                      ${escapeHtml(prospect.email)}
-                    </a>
-                    `
-                    :
-                    ''
-                }
-
-              </div>
-
-
-              ${
-                prospect.notes
-                  ?
-                  `
-                  <div class="card-notes">
-                    ${escapeHtml(
-                      prospect.notes
-                    )}
-                  </div>
-                  `
-                  :
-                  ''
-              }
-
+      return `
+        <div class="card" data-id="${escapeAttr(p.id)}">
+          <div class="card-main">
+            <div class="card-name-row">
+              <span class="card-name">${escapeHtml(p.name)}</span>
+              <span class="badge" style="background:${catCfg.color}22; color:${catCfg.color}; border:1px solid ${catCfg.color}44;">
+                ${catCfg.icon || '🤝'} ${escapeHtml(p.category)}
+              </span>
+              <span class="badge" style="background:${sc.bg}; color:${sc.fg};">
+                ${escapeHtml(p.status)}
+              </span>
             </div>
-
-
-            <div class="card-side">
-
-              <div
-                class="
-                  followup
-                  ${overdue ? 'overdue' : ''}
-                "
-              >
-
-                <span class="lbl">
-                  Prochain suivi
-                </span>
-
-                <span class="val">
-
-                  ${formatDate(
-                    prospect.followup
-                  )}
-
-                  ${
-                    overdue
-                      ? ' ⚠️'
-                      : ''
-                  }
-
-                </span>
-
-              </div>
-
-
-              <div class="card-actions">
-
-                <button
-                  class="icon-btn"
-                  onclick="openEdit('${prospect.id}')"
-                >
-                  Modifier
-                </button>
-
-                <button
-                  class="icon-btn danger"
-                  onclick="deleteProspect('${prospect.id}')"
-                >
-                  Supprimer
-                </button>
-
-              </div>
-
+            <div class="card-contact">
+              ${p.phone ? `<a href="tel:${escapeAttr(p.phone)}">📞 ${escapeHtml(p.phone)}</a>` : ''}
+              ${p.email ? `<a href="mailto:${escapeAttr(p.email)}">✉️ ${escapeHtml(p.email)}</a>` : ''}
             </div>
-
+            ${p.notes ? `<div class="card-notes">${escapeHtml(p.notes)}</div>` : ''}
           </div>
-
-        `;
-
-      }
-    ).join('');
-
+          <div class="card-side">
+            <div class="followup ${overdue ? 'overdue' : ''}">
+              <span class="lbl">Prochain suivi</span>
+              <span class="val">${formatDate(p.followup)}${overdue ? ' ⚠️' : ''}</span>
+            </div>
+            <div class="card-actions">
+              <button class="icon-btn" onclick="openEdit('${escapeAttr(p.id)}')">Modifier</button>
+              <button class="icon-btn danger" onclick="deleteProspect('${escapeAttr(p.id)}')">Supprimer</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
 }
 
+/* ==================== MODAL PROSPECT ==================== */
 
-/* =========================================================
-   MODAL
-========================================================= */
+const overlay = document.getElementById('overlay');
 
-const overlay =
-  document.getElementById(
-    'overlay'
-  );
-
-
-document
-  .getElementById('btnAdd')
-  .addEventListener(
-    'click',
-    openAdd
-  );
-
-
-document
-  .getElementById('btnCancel')
-  .addEventListener(
-    'click',
-    closeModal
-  );
-
-
-overlay.addEventListener(
-  'click',
-  event => {
-
-    if(
-      event.target === overlay
-    ){
-
-      closeModal();
-
-    }
-
-  }
-);
-
-
-/* =========================================================
-   AJOUT
-========================================================= */
+document.getElementById('btnAdd').addEventListener('click', openAdd);
+document.getElementById('btnCancel').addEventListener('click', closeModal);
+overlay.addEventListener('click', e=>{ if(e.target === overlay) closeModal(); });
 
 function openAdd(){
-
   editingId = null;
-
-  document.getElementById(
-    'modalTitle'
-  ).textContent =
-    'Ajouter un prospect';
-
-
-  document.getElementById(
-    'prospectForm'
-  ).reset();
-
-
-  document.getElementById(
-    'fStatus'
-  ).value =
-    'À contacter';
-
-
-  overlay.classList.add(
-    'open'
-  );
-
-
-  document.getElementById(
-    'fName'
-  ).focus();
-
+  document.getElementById('modalTitle').textContent = 'Ajouter un prospect';
+  document.getElementById('prospectForm').reset();
+  document.getElementById('fStatus').value = 'À contacter';
+  updateCategoryDropdown();
+  overlay.classList.add('open');
+  document.getElementById('fName').focus();
 }
-
-
-/* =========================================================
-   MODIFICATION
-========================================================= */
 
 function openEdit(id){
-
-  const prospect =
-    prospects.find(
-      p =>
-        p.id === id
-    );
-
-
-  if(!prospect)
-    return;
-
-
+  const p = prospects.find(x=>x.id === id);
+  if(!p) return;
   editingId = id;
 
-
-  document.getElementById(
-    'modalTitle'
-  ).textContent =
-    'Modifier le prospect';
-
-
-  document.getElementById(
-    'fName'
-  ).value =
-    prospect.name || '';
-
-
-  document.getElementById(
-    'fPhone'
-  ).value =
-    prospect.phone || '';
-
-
-  document.getElementById(
-    'fEmail'
-  ).value =
-    prospect.email || '';
-
-
-  document.getElementById(
-    'fCategory'
-  ).value =
-    prospect.category || '';
-
-
-  document.getElementById(
-    'fStatus'
-  ).value =
-    prospect.status || 'À contacter';
-
-
-  document.getElementById(
-    'fFollowup'
-  ).value =
-    prospect.followup || '';
-
-
-  document.getElementById(
-    'fNotes'
-  ).value =
-    prospect.notes || '';
-
-
-  overlay.classList.add(
-    'open'
-  );
-
+  document.getElementById('modalTitle').textContent = 'Modifier le prospect';
+  document.getElementById('fName').value = p.name || '';
+  document.getElementById('fPhone').value = p.phone || '';
+  document.getElementById('fEmail').value = p.email || '';
+  
+  updateCategoryDropdown();
+  document.getElementById('fCategory').value = p.category || '';
+  document.getElementById('fStatus').value = p.status || 'À contacter';
+  document.getElementById('fFollowup').value = p.followup || '';
+  document.getElementById('fNotes').value = p.notes || '';
+  overlay.classList.add('open');
 }
-
-
-/* =========================================================
-   FERMER MODAL
-========================================================= */
 
 function closeModal(){
-
-  overlay.classList.remove(
-    'open'
-  );
-
+  overlay.classList.remove('open');
   editingId = null;
-
 }
 
+document.getElementById('prospectForm').addEventListener('submit', async e=>{
+  e.preventDefault();
 
-/* =========================================================
-   ENREGISTREMENT FORMULAIRE
-========================================================= */
+  const formData = {
+    name: document.getElementById('fName').value.trim(),
+    phone: document.getElementById('fPhone').value.trim(),
+    email: document.getElementById('fEmail').value.trim(),
+    category: document.getElementById('fCategory').value.trim() || 'Autres',
+    status: document.getElementById('fStatus').value,
+    followup: document.getElementById('fFollowup').value || null,
+    notes: document.getElementById('fNotes').value.trim()
+  };
 
-document
-  .getElementById('prospectForm')
-  .addEventListener(
-    'submit',
-    async event => {
+  if(!formData.name) return;
 
-      event.preventDefault();
-
-
-      const data = {
-
-        name:
-          document
-            .getElementById('fName')
-            .value
-            .trim(),
-
-        phone:
-          document
-            .getElementById('fPhone')
-            .value
-            .trim(),
-
-        email:
-          document
-            .getElementById('fEmail')
-            .value
-            .trim(),
-
-        category:
-          document
-            .getElementById('fCategory')
-            .value
-            .trim()
-          ||
-          'Autres',
-
-        status:
-          document
-            .getElementById('fStatus')
-            .value,
-
-        followup:
-          document
-            .getElementById('fFollowup')
-            .value
-          ||
-          null,
-
-        notes:
-          document
-            .getElementById('fNotes')
-            .value
-            .trim()
-
-      };
-
-
-      if(!data.name)
-        return;
-
-
-      /* =========================
-         MODIFICATION
-      ========================= */
-
-      if(editingId){
-
-        const index =
-          prospects.findIndex(
-            p =>
-              p.id === editingId
-          );
-
-
-        if(index === -1)
-          return;
-
-
-        const updated = {
-
-          ...prospects[index],
-
-          ...data
-
-        };
-
-
-        /*
-          On met à jour immédiatement
-          l'écran.
-        */
-
-        prospects[index] =
-          updated;
-
-
-        closeModal();
-
-        render();
-
-        showToast(
-          'Modification en cours...'
-        );
-
-
-        /*
-          Sauvegarde Supabase.
-        */
-
-        const success =
-          await saveProspect(
-            updated
-          );
-
-
-        if(success){
-
-          render();
-
-          showToast(
-            'Prospect modifié ✓'
-          );
-
-        }
-
-
-        return;
-
-      }
-
-
-      /* =========================
-         NOUVEAU PROSPECT
-      ========================= */
-
-      const newProspect = {
-
-        id:
-          crypto.randomUUID(),
-
-        ...data,
-
-        created_at:
-          new Date().toISOString()
-
-      };
-
-
-      /*
-        Affichage immédiat
-      */
-
-      prospects.push(
-        newProspect
-      );
-
-
+  if(editingId){
+    const idx = prospects.findIndex(p => p.id === editingId);
+    if(idx > -1){
+      prospects[idx] = { ...prospects[idx], ...formData };
       closeModal();
-
       render();
+      await saveSingleProspect(prospects[idx]);
+    }
+  } else {
+    const newProspect = {
+      id: 'temp_' + Date.now(),
+      user_id: currentUser ? currentUser.id : null,
+      ...formData,
+      created_at: new Date().toISOString()
+    };
+    prospects.unshift(newProspect);
+    closeModal();
+    render();
 
-      showToast(
-        'Enregistrement...'
-      );
+    try {
+      const row = {
+        user_id: currentUser.id,
+        name: newProspect.name,
+        phone: newProspect.phone,
+        email: newProspect.email,
+        category: newProspect.category,
+        status: newProspect.status,
+        followup: newProspect.followup,
+        notes: newProspect.notes,
+        created_at: newProspect.created_at
+      };
 
-
-      /*
-        Sauvegarde dans Supabase
-      */
-
-      const success =
-        await saveProspect(
-          newProspect
-        );
-
-
-      if(success){
-
+      const { data, error } = await supabaseClient.from('prospects').insert([row]).select();
+      if (error) {
+        showToast('⚠️ ' + error.message);
+      } else if (data && data[0]) {
+        newProspect.id = data[0].id;
         render();
-
-        showToast(
-          'Prospect enregistré ✓'
-        );
-
+        showToast('Ajouté avec succès ✓');
       }
-
+    } catch(err) {
+      showToast('⚠️ Erreur lors de l’ajout');
     }
-  );
+  }
+});
 
+async function deleteProspect(id){
+  if(!confirm('Êtes-vous sûr de vouloir supprimer ce prospect ?')) return;
+  prospects = prospects.filter(p => p.id !== id);
+  render();
 
-/* =========================================================
-   RECHERCHE
-========================================================= */
-
-document
-  .getElementById('searchInput')
-  .addEventListener(
-    'input',
-    event => {
-
-      searchTerm =
-        event.target.value;
-
-      renderList();
-
+  try {
+    const { error } = await supabaseClient.from('prospects').delete().eq('id', id);
+    if(error){
+      showToast('⚠️ Erreur de suppression');
+    } else {
+      showToast('Supprimé ✓');
     }
-  );
-
-
-/* =========================================================
-   TRI
-========================================================= */
-
-document
-  .getElementById('sortSelect')
-  .addEventListener(
-    'change',
-    event => {
-
-      sortMode =
-        event.target.value;
-
-      renderList();
-
-    }
-  );
-
-
-/* =========================================================
-   DÉMARRAGE
-========================================================= */
+  } catch(err) {
+    showToast('⚠️ Erreur de suppression');
+  }
+}
 
 checkAuth();
-
 </script>
-
 </body>
 </html>
