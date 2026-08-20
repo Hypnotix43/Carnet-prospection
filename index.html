@@ -991,7 +991,17 @@ async function checkAuth(){
   document.getElementById('loginScreen').style.display = 'none';
   
   await loadCategories();
+  if(userCategories.length === 0){
+    await initDefaultCategories();
+    await loadCategories();
+  }
+
   await loadStatuses();
+  if(userStatuses.length === 0){
+    await initDefaultStatuses();
+    await loadStatuses();
+  }
+
   await loadProspects();
   return true;
 }
@@ -1505,7 +1515,6 @@ function render(){
 function renderStats(){
   const total = prospects.length;
   
-  // Compter dynamiquement les cartes de statuts basées sur userStatuses
   const stats = [
     { label: 'Prospects au total', val: total, filterKey: 'all' }
   ];
